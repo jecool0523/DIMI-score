@@ -1,5 +1,6 @@
 import DigitalClock from '@/components/DigitalClock';
 import MarqueeBanner from '@/components/MarqueeBanner';
+import TotalScoreBoard from '@/components/TotalScoreBoard';
 import TimetableView from '@/components/TimetableView';
 import InProgressView from '@/components/InProgressView';
 import PreparationView from '@/components/PreparationView';
@@ -10,9 +11,11 @@ const DisplayPage = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-background pb-14">
-      {/* Top bar with clock */}
-      <header className="flex justify-center py-6">
+      {/* Top bar with clock + score */}
+      <header className="flex items-center justify-between px-8 py-6">
+        <div className="w-[200px]" />
         <DigitalClock />
+        <TotalScoreBoard />
       </header>
 
       {/* Main content */}
