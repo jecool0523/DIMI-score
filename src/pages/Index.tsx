@@ -1,4 +1,5 @@
 import { useCallback } from 'react';
+import DigitalClock from '@/components/DigitalClock';
 import MarqueeBanner from '@/components/MarqueeBanner';
 import TotalScoreBoard from '@/components/TotalScoreBoard';
 import InProgressView from '@/components/InProgressView';
@@ -23,15 +24,28 @@ const DisplayPage = () => {
 
   return (
     <div
-      className="min-h-screen flex flex-col bg-background pb-14 cursor-pointer"
+      className="min-h-screen flex flex-col bg-background cursor-pointer"
       onClick={handleClick}
     >
-      {/* Main scoreboard - takes up most of the screen */}
-      <div className="flex-1 flex items-center justify-center">
-        <TotalScoreBoard currentEventName={currentEventName} />
+      {/* Event title */}
+      <div className="text-center pt-6 pb-2">
+        <span className="text-xs font-semibold tracking-[0.2em] text-muted-foreground uppercase">
+          현재 진행 중
+        </span>
+        <h1 className="font-display text-2xl text-foreground mt-1">
+          {currentEventName === '-' ? '대기 중' : currentEventName}
+        </h1>
       </div>
 
-      {/* Only show sub-views for IN_PROGRESS / PREPARATION */}
+      {/* Clock */}
+      <div className="flex justify-center py-4">
+        <DigitalClock />
+      </div>
+
+      {/* Scoreboard */}
+      <TotalScoreBoard currentEventName={currentEventName} />
+
+      {/* Sub-views */}
       {viewMode === 'IN_PROGRESS' && <InProgressView />}
       {viewMode === 'PREPARATION' && <PreparationView />}
 

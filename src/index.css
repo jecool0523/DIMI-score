@@ -4,53 +4,56 @@
 
 @layer base {
   :root {
-    --background: 222 47% 6%;
-    --foreground: 210 40% 96%;
+    --background: 0 0% 97.6%;
+    --foreground: 180 5% 11%;
 
-    --card: 222 47% 10%;
-    --card-foreground: 210 40% 96%;
+    --card: 0 0% 95.3%;
+    --card-foreground: 180 5% 11%;
 
-    --popover: 222 47% 10%;
-    --popover-foreground: 210 40% 96%;
+    --popover: 0 0% 97.6%;
+    --popover-foreground: 180 5% 11%;
 
-    --primary: 142 71% 45%;
-    --primary-foreground: 222 47% 6%;
+    --primary: 233 100% 37%;
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 222 30% 18%;
-    --secondary-foreground: 210 40% 96%;
+    --secondary: 0 0% 37%;
+    --secondary-foreground: 0 0% 100%;
 
-    --muted: 222 30% 14%;
-    --muted-foreground: 215 20% 55%;
+    --muted: 240 1% 95%;
+    --muted-foreground: 0 0% 37%;
 
-    --accent: 48 96% 53%;
-    --accent-foreground: 222 47% 6%;
+    --accent: 0 0% 88.6%;
+    --accent-foreground: 180 5% 11%;
 
     --destructive: 0 84% 60%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 222 30% 20%;
-    --input: 222 30% 20%;
-    --ring: 142 71% 45%;
+    --border: 0 0% 88.6%;
+    --input: 0 0% 88.6%;
+    --ring: 233 100% 37%;
 
-    --radius: 0.75rem;
+    --radius: 0px;
 
-    --highlight: 142 71% 45%;
-    --highlight-glow: 142 71% 45% / 0.3;
+    --highlight: 233 100% 37%;
+    --highlight-glow: 233 100% 37% / 0.15;
     --warning: 48 96% 53%;
     --warning-glow: 48 96% 53% / 0.3;
-    --completed: 222 20% 30%;
-    --completed-foreground: 215 20% 50%;
-    --inprogress: 142 71% 45%;
+    --completed: 0 0% 88%;
+    --completed-foreground: 0 0% 50%;
+    --inprogress: 233 100% 37%;
     --preparation: 48 96% 53%;
 
-    --sidebar-background: 222 47% 8%;
-    --sidebar-foreground: 210 40% 96%;
-    --sidebar-primary: 142 71% 45%;
-    --sidebar-primary-foreground: 222 47% 6%;
-    --sidebar-accent: 222 30% 14%;
-    --sidebar-accent-foreground: 210 40% 96%;
-    --sidebar-border: 222 30% 20%;
-    --sidebar-ring: 142 71% 45%;
+    --team-a: 233 100% 37%;
+    --team-b: 0 0% 23%;
+
+    --sidebar-background: 0 0% 95%;
+    --sidebar-foreground: 180 5% 11%;
+    --sidebar-primary: 233 100% 37%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 0 0% 88.6%;
+    --sidebar-accent-foreground: 180 5% 11%;
+    --sidebar-border: 0 0% 88.6%;
+    --sidebar-ring: 233 100% 37%;
   }
 }
 
@@ -68,7 +71,8 @@
   .font-display {
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
     font-weight: 900;
-    letter-spacing: -0.02em;
+    letter-spacing: -0.04em;
+    font-style: italic;
   }
 }
 
