@@ -29,6 +29,8 @@ export default {
         completed: { DEFAULT: "hsl(var(--completed))", foreground: "hsl(var(--completed-foreground))" },
         inprogress: "hsl(var(--inprogress))",
         preparation: "hsl(var(--preparation))",
+        "team-a": "hsl(var(--team-a))",
+        "team-b": "hsl(var(--team-b))",
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
           foreground: "hsl(var(--sidebar-foreground))",
