@@ -8,20 +8,23 @@ import { useEventStore } from '@/store/useEventStore';
 
 const DisplayPage = () => {
   const viewMode = useEventStore((s) => s.viewMode);
+  const events = useEventStore((s) => s.events);
+
+  // Find current in-progress event name for display
+  const currentEvent = events.find((e) => e.status === 'IN_PROGRESS');
+  const currentEventName = currentEvent?.name ?? '-';
 
   return (
     <div className="min-h-screen flex flex-col bg-background pb-14">
-      {/* Top bar with clock + score */}
-      <header className="flex items-center justify-between px-8 py-6">
-        <div className="w-[200px]" />
-        <DigitalClock />
-        <TotalScoreBoard />
-      </header>
+      {/* Main scoreboard header */}
+      <TotalScoreBoard currentEventName={currentEventName} />
 
       {/* Main content */}
-      {viewMode === 'TIMETABLE' && <TimetableView />}
-      {viewMode === 'IN_PROGRESS' && <InProgressView />}
-      {viewMode === 'PREPARATION' && <PreparationView />}
+      <div className="flex-1">
+        {viewMode === 'TIMETABLE' && <TimetableView />}
+        {viewMode === 'IN_PROGRESS' && <InProgressView />}
+        {viewMode === 'PREPARATION' && <PreparationView />}
+      </div>
 
       {/* Marquee */}
       <MarqueeBanner />
