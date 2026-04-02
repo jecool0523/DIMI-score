@@ -1,5 +1,4 @@
 import { useEventStore } from '@/store/useEventStore';
-import DigitalClock from './DigitalClock';
 
 interface Props {
   currentEventName: string;
@@ -18,27 +17,46 @@ const TotalScoreBoard = ({ currentEventName }: Props) => {
   });
 
   return (
-    <div className="flex items-center justify-between px-12 py-10">
-      {/* Team A - Blue */}
-      <div className="flex flex-col items-center gap-3 min-w-[200px]">
-        <div className="w-20 h-10 rounded" style={{ backgroundColor: 'hsl(210, 100%, 50%)' }} />
-        <span className="font-display text-3xl text-foreground">청팀</span>
-        <span className="font-display text-7xl text-foreground">{totalA}</span>
-      </div>
+    <div className="w-full">
+      {/* Scores section */}
+      <div className="grid grid-cols-2 w-full">
+        {/* Team A */}
+        <div className="relative bg-muted p-8 pt-2">
+          <div className="absolute top-0 left-0 right-0 h-1 bg-primary" />
+          <div className="flex items-start justify-between">
+            <div>
+              <span className="text-xs font-semibold tracking-[0.15em] text-primary uppercase">
+                HOME TEAM
+              </span>
+              <h2 className="font-display text-4xl text-foreground mt-1 leading-tight">청팀</h2>
+            </div>
+            <div className="w-12 h-12 bg-primary flex items-center justify-center">
+              <span className="text-primary-foreground text-lg">⚡</span>
+            </div>
+          </div>
+          <span className="font-display text-[10rem] leading-none text-foreground block mt-4">
+            {totalA}
+          </span>
+        </div>
 
-      {/* Center - Clock + Event */}
-      <div className="flex flex-col items-center gap-2">
-        <DigitalClock />
-        <span className="font-display text-2xl text-muted-foreground">
-          종목 - {currentEventName}
-        </span>
-      </div>
-
-      {/* Team B - Black/Dark */}
-      <div className="flex flex-col items-center gap-3 min-w-[200px]">
-        <div className="w-20 h-10 rounded bg-foreground" />
-        <span className="font-display text-3xl text-foreground">백팀</span>
-        <span className="font-display text-7xl text-foreground">{totalB}</span>
+        {/* Team B */}
+        <div className="relative bg-muted p-8 pt-2">
+          <div className="absolute top-0 left-0 right-0 h-1" style={{ backgroundColor: 'hsl(0 0% 23%)' }} />
+          <div className="flex items-start justify-between">
+            <div className="w-12 h-12 flex items-center justify-center" style={{ backgroundColor: 'hsl(0 0% 23%)' }}>
+              <span className="text-white text-lg">⚡</span>
+            </div>
+            <div className="text-right">
+              <span className="text-xs font-semibold tracking-[0.15em] text-muted-foreground uppercase">
+                AWAY TEAM
+              </span>
+              <h2 className="font-display text-4xl text-foreground mt-1 leading-tight">백팀</h2>
+            </div>
+          </div>
+          <span className="font-display text-[10rem] leading-none text-foreground block mt-4 text-right">
+            {totalB}
+          </span>
+        </div>
       </div>
     </div>
   );
