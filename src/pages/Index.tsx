@@ -1,16 +1,29 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import DigitalClock from '@/components/DigitalClock';
+import MarqueeBanner from '@/components/MarqueeBanner';
+import TimetableView from '@/components/TimetableView';
+import InProgressView from '@/components/InProgressView';
+import PreparationView from '@/components/PreparationView';
+import { useEventStore } from '@/store/useEventStore';
 
-// IMPORTANT: Fully REPLACE this with your own code
-const PlaceholderIndex = () => {
-  // PLACEHOLDER: Replace this entire return statement with the user's app.
-  // The inline background color is intentionally not part of the design system.
+const DisplayPage = () => {
+  const viewMode = useEventStore((s) => s.viewMode);
+
   return (
-    <div className="flex min-h-screen items-center justify-center" style={{ backgroundColor: '#fcfbf8' }}>
-      <img data-lovable-blank-page-placeholder="REMOVE_THIS" src="/placeholder.svg" alt="Your app will live here!" />
+    <div className="min-h-screen flex flex-col bg-background pb-14">
+      {/* Top bar with clock */}
+      <header className="flex justify-center py-6">
+        <DigitalClock />
+      </header>
+
+      {/* Main content */}
+      {viewMode === 'TIMETABLE' && <TimetableView />}
+      {viewMode === 'IN_PROGRESS' && <InProgressView />}
+      {viewMode === 'PREPARATION' && <PreparationView />}
+
+      {/* Marquee */}
+      <MarqueeBanner />
     </div>
   );
 };
 
-const Index = PlaceholderIndex;
-
-export default Index;
+export default DisplayPage;
