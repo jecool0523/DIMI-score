@@ -1,8 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { useEventStore } from '@/store/useEventStore';
 import confetti from 'canvas-confetti';
-import { icons } from 'lucide-react';
-import { ArrowRight } from 'lucide-react';
+import { icons, ArrowRight, Clock } from 'lucide-react';
 
 const InProgressView = () => {
   const events = useEventStore((s) => s.events);
@@ -62,7 +61,11 @@ const InProgressView = () => {
       {/* Main event icon & name */}
       <div className="flex flex-col items-center gap-4">
         {IconComponent && <IconComponent size={96} className="text-primary" />}
-        <h1 className="font-display text-6xl text-foreground">{current.name}</h1>
+        <h1 className="font-display text-6xl text-foreground mb-2">{current.name}</h1>
+        <div className="flex items-center gap-2 bg-secondary/80 px-6 py-2 rounded-full border border-border/50 shadow-sm text-muted-foreground text-2xl font-medium tracking-wide mb-4">
+          <Clock size={24} className="text-primary" />
+          <span>진행 시간: {current.time} ~ {next ? next.time : '종료 시까지'}</span>
+        </div>
       </div>
 
       {/* Scoreboard */}
