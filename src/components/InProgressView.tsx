@@ -18,8 +18,12 @@ const InProgressView = () => {
 
   const IconComponent = icons[current.icon as keyof typeof icons];
 
+  const totalScore = (current.scoreA || 0) + (current.scoreB || 0);
+  const percentA = totalScore === 0 ? 50 : (current.scoreA / totalScore) * 100;
+  const percentB = totalScore === 0 ? 50 : (current.scoreB / totalScore) * 100;
+
   return (
-    <div className="flex-1 flex flex-col items-center justify-center px-8 gap-8">
+    <div className="flex-1 flex flex-col items-center justify-center px-8 gap-8 w-full max-w-5xl">
       {/* Main event icon & name */}
       <div className="flex flex-col items-center gap-4">
         {IconComponent && <IconComponent size={96} className="text-primary" />}
@@ -28,15 +32,33 @@ const InProgressView = () => {
 
       {/* Scoreboard */}
       {current.teamA && current.teamB && (
-        <div className="flex items-center gap-8 mt-4">
-          <div className="flex flex-col items-center gap-2">
-            <span className="text-2xl font-semibold text-muted-foreground">{current.teamA}</span>
-            <span className="font-display text-9xl text-foreground leading-none">{current.scoreA}</span>
+        <div className="flex flex-col items-center w-full mt-4">
+          <div className="flex items-center justify-center gap-20 w-full">
+            <div className="flex flex-col items-center gap-2 flex-1 items-end">
+              <span className="text-3xl font-semibold tracking-widest text-primary uppercase">{current.teamA}</span>
+              <span className="font-display text-[12rem] text-foreground leading-none drop-shadow-md">{current.scoreA}</span>
+            </div>
+            <span className="font-display text-7xl text-muted-foreground/30 mb-8">:</span>
+            <div className="flex flex-col items-center gap-2 flex-1 items-start">
+              <span className="text-3xl font-semibold tracking-widest text-muted-foreground uppercase">{current.teamB}</span>
+              <span className="font-display text-[12rem] text-foreground leading-none drop-shadow-md">{current.scoreB}</span>
+            </div>
           </div>
-          <span className="font-display text-5xl text-muted-foreground">:</span>
-          <div className="flex flex-col items-center gap-2">
-            <span className="text-2xl font-semibold text-muted-foreground">{current.teamB}</span>
-            <span className="font-display text-9xl text-foreground leading-none">{current.scoreB}</span>
+
+          {/* Visual Score Bar */}
+          <div className="w-full max-w-4xl h-8 flex rounded-full overflow-hidden bg-secondary mt-12 relative shadow-inner">
+            <div
+              className="h-full bg-primary transition-all duration-700 ease-out flex items-center justify-start px-4"
+              style={{ width: `${percentA}%` }}
+            >
+              {percentA >= 15 && <span className="text-primary-foreground font-bold text-sm">{Math.round(percentA)}%</span>}
+            </div>
+            <div
+              className="h-full transition-all duration-700 ease-out flex items-center justify-end px-4"
+              style={{ width: `${percentB}%`, backgroundColor: 'hsl(0 0% 23%)' }}
+            >
+              {percentB >= 15 && <span className="text-white font-bold text-sm">{Math.round(percentB)}%</span>}
+            </div>
           </div>
         </div>
       )}
