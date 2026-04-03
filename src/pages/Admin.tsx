@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useEventStore, type ViewMode } from '@/store/useEventStore';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Monitor, Play, AlertTriangle, Plus, Minus, RotateCcw, Send } from 'lucide-react';
+import { Monitor, Play, AlertTriangle, Plus, Minus, RotateCcw, Send, Lock } from 'lucide-react';
+import { toast } from 'sonner';
 
 const modeButtons: { mode: ViewMode; label: string; icon: React.ReactNode }[] = [
   { mode: 'TIMETABLE', label: '시간표', icon: <Monitor size={18} /> },
@@ -11,6 +12,26 @@ const modeButtons: { mode: ViewMode; label: string; icon: React.ReactNode }[] = 
 ];
 
 const AdminPage = () => {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [password, setPassword] = useState('');
+
+  useEffect(() => {
+    if (sessionStorage.getItem('dimi-admin-auth') === 'true') {
+      setIsAuthenticated(true);
+    }
+  }, []);
+
+  const handleLogin = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (password === 'dimi') {
+      setIsAuthenticated(true);
+      sessionStorage.setItem('dimi-admin-auth', 'true');
+      toast.success('관리자 페이지에 로그인되었습니다.');
+    } else {
+      toast.error('비밀번호가 틀렸습니다.');
+    }
+  };
+
   const { viewMode, setViewMode, events, setEventStatus, updateScore, resetScore, setAnnouncement } = useEventStore();
   const [announcementInput, setAnnouncementInput] = useState('');
 
@@ -18,12 +39,49 @@ const AdminPage = () => {
     if (announcementInput.trim()) {
       setAnnouncement(announcementInput.trim());
       setAnnouncementInput('');
+      toast.success('공지사항이 전송되었습니다.');
     }
   };
 
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-background flex flex-col items-center justify-center p-6">
+        <div className="bg-card border border-border p-8 rounded-xl shadow-lg w-full max-w-sm">
+          <div className="flex flex-col items-center mb-6">
+            <div className="bg-primary/10 p-3 rounded-full mb-4">
+              <Lock className="text-primary" size={24} />
+            </div>
+            <h1 className="font-display text-2xl font-semibold text-foreground text-center">관리자 로그인</h1>
+            <p className="text-sm text-muted-foreground text-center mt-2">페이지에 접근하려면 비밀번호를 입력해주세요.</p>
+          </div>
+          <form onSubmit={handleLogin} className="space-y-4">
+            <Input
+              type="password"
+              placeholder="비밀번호를 입력하세요"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full text-center"
+              autoFocus
+            />
+            <Button type="submit" className="w-full">접속하기</Button>
+          </form>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background p-6">
-      <h1 className="font-display text-3xl text-foreground mb-6">⚙️ 컨트롤 패널</h1>
+      <div className="flex items-center justify-between mb-6 border-b border-border pb-4">
+        <h1 className="font-display text-3xl text-foreground">⚙️ 컨트롤 패널</h1>
+        <Button variant="outline" size="sm" onClick={() => {
+          sessionStorage.removeItem('dimi-admin-auth');
+          setIsAuthenticated(false);
+          toast.info('로그아웃 되었습니다.');
+        }}>
+          로그아웃
+        </Button>
+      </div>
 
       {/* Mode switch */}
       <section className="mb-8">
@@ -69,11 +127,10 @@ const AdminPage = () => {
                 <div className="flex items-center gap-3">
                   <span className="text-muted-foreground font-mono">{event.time}</span>
                   <span className="font-display text-lg text-foreground">{event.name}</span>
-                  <span className={`text-sm px-2 py-0.5 rounded ${
-                    event.status === 'COMPLETED' ? 'bg-completed text-completed-foreground' :
-                    event.status === 'IN_PROGRESS' ? 'bg-inprogress/20 text-inprogress' :
-                    'bg-secondary text-muted-foreground'
-                  }`}>
+                  <span className={`text-sm px-2 py-0.5 rounded ${event.status === 'COMPLETED' ? 'bg-completed text-completed-foreground' :
+                      event.status === 'IN_PROGRESS' ? 'bg-inprogress/20 text-inprogress' :
+                        'bg-secondary text-muted-foreground'
+                    }`}>
                     {event.status === 'COMPLETED' ? '완료' : event.status === 'IN_PROGRESS' ? '진행중' : '예정'}
                   </span>
                 </div>
