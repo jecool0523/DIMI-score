@@ -1,4 +1,6 @@
+import { useEffect, useRef } from 'react';
 import { useEventStore } from '@/store/useEventStore';
+import confetti from 'canvas-confetti';
 import { icons } from 'lucide-react';
 import { ArrowRight } from 'lucide-react';
 
@@ -7,6 +9,39 @@ const InProgressView = () => {
   const current = events.find((e) => e.status === 'IN_PROGRESS');
   const currentIdx = events.findIndex((e) => e.status === 'IN_PROGRESS');
   const next = currentIdx >= 0 ? events.slice(currentIdx + 1).find((e) => e.status === 'UPCOMING') : null;
+
+  const prevScoreARef = useRef(current?.scoreA);
+  const prevScoreBRef = useRef(current?.scoreB);
+
+  useEffect(() => {
+    if (current?.scoreA !== undefined && prevScoreARef.current !== undefined) {
+      if (current.scoreA > prevScoreARef.current) {
+        confetti({
+          particleCount: 150,
+          spread: 80,
+          origin: { x: 0, y: 0.5 },
+          angle: 45,
+          colors: ['#3b82f6', '#60a5fa', '#93c5fd', '#ffffff']
+        });
+      }
+    }
+    prevScoreARef.current = current?.scoreA;
+  }, [current?.scoreA]);
+
+  useEffect(() => {
+    if (current?.scoreB !== undefined && prevScoreBRef.current !== undefined) {
+      if (current.scoreB > prevScoreBRef.current) {
+        confetti({
+          particleCount: 150,
+          spread: 80,
+          origin: { x: 1, y: 0.5 },
+          angle: 135,
+          colors: ['#ffffff', '#f8fafc', '#e2e8f0', '#94a3b8']
+        });
+      }
+    }
+    prevScoreBRef.current = current?.scoreB;
+  }, [current?.scoreB]);
 
   if (!current) {
     return (
