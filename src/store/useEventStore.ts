@@ -64,3 +64,24 @@ export const useEventStore = create<EventStore>((set) => ({
       events: state.events.map((e) => (e.id === id ? { ...e, scoreA: 0, scoreB: 0 } : e)),
     })),
 }));
+
+// Cross-tab synchronization via BroadcastChannel
+const channel = new BroadcastChannel('dimi-score-sync');
+let isReceiving = false;
+
+channel.onmessage = (event) => {
+  isReceiving = true;
+  useEventStore.setState(event.data);
+  isReceiving = false;
+};
+
+useEventStore.subscribe((state) => {
+  if (!isReceiving) {
+    channel.postMessage({
+      viewMode: state.viewMode,
+      announcement: state.announcement,
+      events: state.events,
+    });
+  }
+});
+
