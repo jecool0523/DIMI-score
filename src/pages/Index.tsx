@@ -20,8 +20,8 @@ const DisplayPage = () => {
 
   return (
     <div
-      className="min-h-screen flex flex-col bg-background cursor-pointer"
-      onClick={handleClick}
+      className="min-h-screen flex flex-col bg-background"
+      onDoubleClick={handleClick}
     >
       {/* Clock always on top */}
       <div className="flex justify-center py-6">
