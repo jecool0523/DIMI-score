@@ -18,6 +18,7 @@ export interface SportEvent {
 interface EventStore {
   viewMode: ViewMode;
   announcement: string;
+  announcementTimestamp: number;
   events: SportEvent[];
   setViewMode: (mode: ViewMode) => void;
   setAnnouncement: (text: string) => void;
@@ -40,10 +41,11 @@ const defaultEvents: SportEvent[] = [
 export const useEventStore = create<EventStore>((set) => ({
   viewMode: 'TIMETABLE',
   announcement: '🎉 제25회 체육대회에 오신 것을 환영합니다! 안전하고 즐거운 대회가 되길 바랍니다.',
+  announcementTimestamp: 0,
   events: defaultEvents,
 
   setViewMode: (mode) => set({ viewMode: mode }),
-  setAnnouncement: (text) => set({ announcement: text }),
+  setAnnouncement: (text) => set({ announcement: text, announcementTimestamp: Date.now() }),
 
   setEventStatus: (id, status) =>
     set((state) => ({
@@ -80,6 +82,7 @@ useEventStore.subscribe((state) => {
     channel.postMessage({
       viewMode: state.viewMode,
       announcement: state.announcement,
+      announcementTimestamp: state.announcementTimestamp,
       events: state.events,
     });
   }
