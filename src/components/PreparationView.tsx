@@ -41,12 +41,35 @@ const PreparationView = () => {
       >
         <TotalScoreBoard />
 
+        {/* Global Pixel Patterns Extracted From Figma */}
+        {[
+          // Right edge complex structure
+          { l: 1888.5, t: 120, s: 31.5 }, { l: 1888.5, t: 309, s: 31.5 }, { l: 1888.5, t: 561, s: 31.5 },
+          { l: 1888.5, t: 372, s: 31.5 }, { l: 1888.5, t: 624, s: 31.5 }, { l: 1888.5, t: 403.5, s: 31.5 },
+          { l: 1888.5, t: 214.5, s: 31.5 }, { l: 1888.5, t: 466.5, s: 31.5 }, { l: 1888.5, t: 246, s: 31.5 },
+          { l: 1888.5, t: 498, s: 31.5 },
+          { l: 1857, t: 151.5, s: 31.5 }, { l: 1857, t: 340.5, s: 31.5 }, { l: 1857, t: 592.5, s: 31.5 },
+          { l: 1857, t: 403.5, s: 31.5 }, { l: 1857, t: 183, s: 31.5 }, { l: 1857, t: 435, s: 31.5 },
+          { l: 1857, t: 466.5, s: 31.5 }, { l: 1825.5, t: 120.15, s: 31.5 },
+          // Left edge complex structure
+          { l: 29.5, t: 951.5, s: 29.5 }, { l: 0, t: 804, s: 29.5 }, { l: 29.5, t: 774.5, s: 29.5 },
+          { l: 0, t: 745, s: 29.5 }, { l: 29.5, t: 715.5, s: 29.5 }, { l: 0, t: 715.5, s: 29.5 },
+          { l: 29.5, t: 922, s: 29.5 }, { l: 29.5, t: 686, s: 29.5 }, { l: 0, t: 892.5, s: 29.5 },
+          { l: 29.5, t: 656.5, s: 29.5 }, { l: 0, t: 656.5, s: 29.5 }, { l: 0, t: 863, s: 29.5 }
+        ].map((dot, idx) => (
+          <div
+            key={idx}
+            className="absolute bg-[#ff40c2]"
+            style={{ left: `${dot.l}px`, top: `${dot.t}px`, width: `${dot.s}px`, height: `${dot.s}px` }}
+          />
+        ))}
+
         {/* Content Box (Left) */}
         <div className="absolute top-[120px] left-0 w-[916px] h-[861px]">
-          <p className="absolute font-['Pretendard'] font-bold leading-normal left-[94px] text-[93px] text-white top-[100px] whitespace-nowrap m-0 tracking-tight">
+          <p className="absolute font-['Pretendard'] font-bold leading-normal left-[94.6px] text-[93.3px] text-white top-[219.4px] whitespace-nowrap m-0 tracking-tight">
             다음 종목
           </p>
-          <p className="absolute font-['Pretendard'] font-extrabold leading-tight left-[71px] text-[205px] text-white top-[242px] whitespace-nowrap m-0 tracking-tighter w-[800px] break-keep">
+          <p className="absolute font-['Pretendard'] font-extrabold leading-tight left-[71.3px] text-[205.4px] text-white top-[362.1px] whitespace-nowrap m-0 tracking-tighter w-[800px] break-keep">
             {nextEvent.name}
           </p>
         </div>
@@ -58,13 +81,13 @@ const PreparationView = () => {
 
         {/* Content Box (Right Top) */}
         <div className="absolute top-[120px] left-[917px] w-[1003px] h-[535px]">
-          <div className="absolute font-display leading-[0.85] left-[104px] text-[#ff40c2] text-[130px] top-[218px] uppercase select-none m-0 flex flex-col gap-[10px] tracking-widest">
+          <div className="absolute font-display leading-[1] left-[87.3px] text-[#ff40c2] text-[130.8px] top-[217.9px] uppercase select-none m-0 flex flex-col tracking-widest gap-0">
             <span>DIMIGO</span>
             <span>SPORTS</span>
             <span>DAY</span>
           </div>
 
-          <div className="absolute font-display leading-[0.85] right-[88px] text-[#ff40c2] text-[171px] text-right top-[164px] m-0 flex flex-col gap-[10px] tracking-widest tabular-nums">
+          <div className="absolute font-display leading-[1] right-[128.3px] text-[#ff40c2] text-[171.6px] text-right top-[164.4px] m-0 flex flex-col tracking-widest tabular-nums gap-0">
             <span>{hours}</span>
             <span>{minutes}</span>
             <span>{seconds}</span>
@@ -84,7 +107,7 @@ const PreparationView = () => {
         {/* Content Box (Left Bottom) */}
         <div className="absolute top-[656px] left-0 w-[1046px] h-[325px] overflow-hidden">
           {/* Pink Arrows */}
-          <div className="absolute top-[90px] left-[150px] right-0 flex gap-20">
+          <div className="absolute top-[80px] left-[190px] right-0 flex gap-20">
             <div className="w-[124px] h-[124px] animate-pulse">
               <img src="/assets/arrow-right-pink.svg" className="w-full h-full" alt="" />
             </div>
@@ -95,13 +118,6 @@ const PreparationView = () => {
               <img src="/assets/arrow-right-pink.svg" className="w-full h-full" alt="" />
             </div>
           </div>
-
-          {/* Noise Pixel Dots */}
-          <div className="absolute bg-[#ff40c2] size-[29px] bottom-[30px] left-[29px]" />
-          <div className="absolute bg-[#ff40c2] size-[29px] bottom-[120px] left-0" />
-          <div className="absolute bg-[#ff40c2] size-[29px] top-[29px] left-[29px]" />
-          <div className="absolute bg-[#ff40c2] size-[29px] top-[60px] left-0" />
-          <div className="absolute bg-[#ff40c2] size-[29px] bottom-[200px] left-[29px]" />
         </div>
 
         {/* Content Box (Right Bottom) */}
@@ -110,13 +126,6 @@ const PreparationView = () => {
             <span>선수분들은 준비해</span>
             <span>주시길 바랍니다.</span>
           </div>
-
-          {/* Right Noise Pixel Dots */}
-          <div className="absolute bg-[#ff40c2] size-[31px] top-[63px] right-[31px]" />
-          <div className="absolute bg-[#ff40c2] size-[31px] top-[188px] right-[31px]" />
-          <div className="absolute bg-[#ff40c2] size-[31px] top-[125px] right-0" />
-          <div className="absolute bg-[#ff40c2] size-[31px] top-[282px] right-0" />
-          <div className="absolute bg-[#ff40c2] size-[31px] top-[219px] right-[31px]" />
         </div>
 
         {/* Footer from Figma */}
