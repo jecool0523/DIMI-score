@@ -1,10 +1,7 @@
+import { useEffect, useState } from 'react';
 import { useEventStore } from '@/store/useEventStore';
 
-interface Props {
-  currentEventName: string;
-}
-
-const TotalScoreBoard = ({ currentEventName }: Props) => {
+const TotalScoreBoard = () => {
   const events = useEventStore((s) => s.events);
 
   let totalA = 0;
@@ -16,46 +13,54 @@ const TotalScoreBoard = ({ currentEventName }: Props) => {
     }
   });
 
-  return (
-    <div className="w-full">
-      {/* Scores section */}
-      <div className="grid grid-cols-2 w-full">
-        {/* Team A */}
-        <div className="relative bg-muted p-8 pt-2">
-          <div className="absolute top-0 left-0 right-0 h-1 bg-primary" />
-          <div className="flex items-start justify-between">
-            <div>
-              <span className="text-xs font-semibold tracking-[0.15em] text-primary uppercase">
-                HOME TEAM
-              </span>
-              <h2 className="font-display text-4xl text-foreground mt-1 leading-tight">청팀</h2>
-            </div>
-            <div className="w-12 h-12 bg-primary flex items-center justify-center">
-              <span className="text-primary-foreground text-lg">⚡</span>
-            </div>
-          </div>
-          <span className="font-display text-[10rem] leading-none text-foreground block mt-4">
-            {totalA}
-          </span>
-        </div>
+  const [scale, setScale] = useState(1);
 
-        {/* Team B */}
-        <div className="relative bg-muted p-8 pt-2">
-          <div className="absolute top-0 left-0 right-0 h-1" style={{ backgroundColor: 'hsl(0 0% 23%)' }} />
-          <div className="flex items-start justify-between">
-            <div className="w-12 h-12 flex items-center justify-center" style={{ backgroundColor: 'hsl(0 0% 23%)' }}>
-              <span className="text-white text-lg">⚡</span>
-            </div>
-            <div className="text-right">
-              <span className="text-xs font-semibold tracking-[0.15em] text-muted-foreground uppercase">
-                AWAY TEAM
-              </span>
-              <h2 className="font-display text-4xl text-foreground mt-1 leading-tight">백팀</h2>
-            </div>
-          </div>
-          <span className="font-display text-[10rem] leading-none text-foreground block mt-4 text-right">
-            {totalB}
-          </span>
+  useEffect(() => {
+    const handleResize = () => {
+      // Scale based on the width of the screen, assuming 1920 is the base width. 
+      // If we are on a smaller screen, it will scale down to fit nicely.
+      // Maximum scale is 1.
+      setScale(Math.min(window.innerWidth / 1920, 1));
+    };
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  return (
+    <div className="w-full flex justify-center mb-8 bg-transparent overflow-hidden">
+      <div
+        className="content-stretch flex items-center relative w-[1920px] shrink-0 h-[120px]"
+        style={{ transform: `scale(${scale})`, transformOrigin: 'center' }}
+      >
+        <div className="bg-[#04f] h-[120px] overflow-clip relative shrink-0 w-[1014px]">
+          <div className="absolute bg-white left-[994px] size-[20px] top-0" />
+          <div className="absolute bg-white left-[994px] size-[20px] top-[20px]" />
+          <div className="absolute bg-white left-[974px] size-[20px] top-[20px]" />
+          <div className="absolute bg-white left-[974px] size-[20px] top-[60px]" />
+          <div className="absolute bg-white left-[994px] size-[20px] top-[60px]" />
+          <p className="absolute font-display font-bold leading-[normal] left-[40px] text-[110px] text-white top-[-5px] whitespace-nowrap m-0">
+            {totalA.toLocaleString()}P
+          </p>
+          <div className="absolute bg-white left-[994px] size-[20px] top-[100px]" />
+          <div className="absolute bg-[#04f] left-[994px] size-[20px] top-[20px]" />
+        </div>
+        <div className="bg-white h-[120px] overflow-clip relative shrink-0 w-[906px]">
+          <div className="absolute bg-[#04f] left-0 size-[20px] top-0" />
+          <div className="absolute bg-white left-0 size-[20px] top-[20px]" />
+          <div className="absolute bg-[#04f] left-0 size-[20px] top-[40px]" />
+          <div className="absolute bg-[#04f] left-0 size-[20px] top-[60px]" />
+          <div className="absolute bg-white left-0 size-[20px] top-[80px]" />
+          <div className="absolute bg-[#04f] left-[20px] size-[20px] top-[80px]" />
+          <div className="absolute bg-[#04f] left-[40px] size-[20px] top-[80px]" />
+          <div className="absolute bg-[#04f] left-[40px] size-[20px] top-[60px]" />
+          <div className="absolute bg-[#04f] left-[20px] size-[20px] top-[40px]" />
+          <div className="absolute bg-[#04f] left-[40px] size-[20px] top-[20px]" />
+          <div className="absolute bg-[#04f] left-[20px] size-[20px] top-0" />
+          <div className="absolute bg-[#04f] left-0 size-[20px] top-[100px]" />
+          <p className="absolute font-display font-bold leading-[normal] right-[40px] text-[#04f] text-[110px] top-[-5px] whitespace-nowrap m-0 text-right">
+            {totalB.toLocaleString()}P
+          </p>
         </div>
       </div>
     </div>

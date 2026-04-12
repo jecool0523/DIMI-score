@@ -57,12 +57,15 @@ const EventRow = ({ event }: { event: SportEvent }) => {
   );
 };
 
+import TotalScoreBoard from './TotalScoreBoard';
+
 const TimetableView = () => {
   const events = useEventStore((s) => s.events);
 
   return (
-    <div className="flex-1 flex flex-col items-center justify-center px-8 py-6">
-      <h1 className="font-display text-5xl text-foreground mb-8">📋 전체 일정표</h1>
+    <div className="flex-1 flex flex-col items-center justify-start w-full py-6">
+      <TotalScoreBoard />
+      <h1 className="font-display text-5xl text-foreground mb-8 mt-4">📋 전체 일정표</h1>
       <div className="w-full max-w-3xl">
         {events.map((event) => (
           <EventRow key={event.id} event={event} />

@@ -4,6 +4,7 @@ import MarqueeBanner from '@/components/MarqueeBanner';
 import InProgressView from '@/components/InProgressView';
 import PreparationView from '@/components/PreparationView';
 import TimetableView from '@/components/TimetableView';
+import AnnouncementOverlay from '@/components/AnnouncementOverlay';
 import { useEventStore } from '@/store/useEventStore';
 import { Clock } from 'lucide-react';
 
@@ -62,18 +63,7 @@ const DisplayPage = () => {
       <MarqueeBanner />
 
       {/* Big Announcement Overlay */}
-      {showBigAnnouncement && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-sm animate-in fade-in zoom-in duration-500">
-          <div className="text-center p-8 max-w-[90vw]">
-            <h2 className="text-4xl text-warning font-bold mb-8 uppercase tracking-widest animate-pulse">
-              📢 공지사항
-            </h2>
-            <p className="text-[5rem] leading-tight font-display text-white break-keep drop-shadow-lg">
-              {announcement}
-            </p>
-          </div>
-        </div>
-      )}
+      <AnnouncementOverlay show={showBigAnnouncement} announcement={announcement} />
     </div>
   );
 };
