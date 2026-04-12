@@ -13,20 +13,6 @@ const TotalScoreBoard = () => {
     }
   });
 
-  const [scale, setScale] = useState(1);
-
-  useEffect(() => {
-    const handleResize = () => {
-      // Scale based on the width of the screen, assuming 1920 is the base width. 
-      // If we are on a smaller screen, it will scale down to fit nicely.
-      // Maximum scale is 1.
-      setScale(Math.min(window.innerWidth / 1920, 1));
-    };
-    handleResize();
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
-
   return (
     <div className="w-full flex justify-center mb-8 bg-transparent overflow-hidden">
       <div
