@@ -47,39 +47,72 @@ const TimetableView = () => {
 
         {/* Vertical stripes for events */}
         <div className="absolute top-[120px] left-0 flex w-[1920px] h-[530px]">
-          {events.map((event, index) => {
-            const isPink = index % 2 === 0;
-            const bgClass = isPink ? 'bg-[#ff40c3]' : 'bg-black';
-            const textClass = isPink ? 'text-black' : 'text-[#ff40c2]'; // Pink text on black
+          {(() => {
+            const currentTotalMinutes = time.getHours() * 60 + time.getMinutes();
+            const getMinutes = (t: string) => {
+              const [h, m] = t.split(':').map(Number);
+              return h * 60 + m;
+            };
 
-            return (
-              <div
-                key={event.id}
-                onClick={(e) => handleClick(e, event)}
-                className={`relative overflow-hidden flex-[1_1_100%] cursor-pointer transition-transform active:scale-95 ${bgClass}`}
-              >
-                {/* Event Name */}
-                <div className={`absolute top-[40px] left-1/2 -translate-x-1/2 flex flex-col items-center font-['Pretendard'] font-extrabold text-[80px] leading-[0.8] select-none whitespace-nowrap ${textClass}`}>
-                  {event.name.split('').map((char, i) => (
-                    <span key={i} className="mb-2">{char}</span>
-                  ))}
+            const effectiveEvents = events.map((ev, idx) => {
+              const nextEv = events[idx + 1];
+              // Event is assumed ended if current time has passed the next event's start time
+              const isTimeCompleted = nextEv
+                ? currentTotalMinutes >= getMinutes(nextEv.time)
+                : currentTotalMinutes >= getMinutes(ev.time) + 60;
+
+              let effStatus = ev.status;
+              // If untouched/UPCOMING but time has naturally progressed past it, visually mark as COMPLETED
+              if (effStatus === 'UPCOMING' && isTimeCompleted) {
+                effStatus = 'COMPLETED';
+              }
+              return { ...ev, effectiveStatus: effStatus };
+            });
+
+            const firstUpcomingEvent = effectiveEvents.find((e) => e.effectiveStatus === 'UPCOMING');
+
+            return effectiveEvents.map((event, index) => {
+              const isPink = index % 2 === 0;
+              const bgClass = isPink ? 'bg-[#ff40c3]' : 'bg-black';
+              const textClass = isPink ? 'text-black' : 'text-[#ff40c2]';
+              const iconTop = !isPink; // Top if black, bottom if pink
+              const isCompleted = event.effectiveStatus === 'COMPLETED';
+              const isNextEvent = event.effectiveStatus === 'UPCOMING' && event.id === firstUpcomingEvent?.id;
+
+              return (
+                <div
+                  key={event.id}
+                  onClick={(e) => handleClick(e, event)}
+                  className={`relative overflow-hidden flex-[1_1_100%] cursor-pointer transition-transform active:scale-95 ${bgClass}`}
+                >
+                  {/* Event Name */}
+                  <div className={`absolute top-[40px] left-1/2 -translate-x-1/2 flex flex-col items-center font-['Pretendard'] font-extrabold text-[80px] leading-[0.8] select-none whitespace-nowrap z-0 ${textClass}`}>
+                    {event.name.split('').map((char, i) => (
+                      <span key={i} className="mb-2">{char}</span>
+                    ))}
+                  </div>
+
+                  {/* Dim Overlay */}
+                  {isCompleted && (
+                    <div className="absolute inset-0 bg-black/60 pointer-events-none z-10" />
+                  )}
+
+                  {/* Status Icons */}
+                  <div className={`absolute left-1/2 -translate-x-1/2 w-[42px] h-[42px] z-20 ${iconTop ? 'top-[40px]' : 'bottom-[40px]'}`}>
+                    {isCompleted && (
+                      <img src="/assets/completed-box.svg" alt="completed" className="w-[42px] h-[42px] absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
+                    )}
+                    {event.effectiveStatus === 'IN_PROGRESS' && (
+                      <img src="/assets/loading-circle.svg" alt="in progress" className="w-[60px] h-[61px] absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 scale-[1.3]" />
+                    )}
+                    {isNextEvent && (
+                      <img src="/assets/arrow-up.svg" alt="upcoming" className="w-[56px] h-[56px] absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rotate-90 scale-125" />
+                    )}
+                  </div>
                 </div>
-
-                {/* Status Icons */}
-                {event.status === 'COMPLETED' && (
-                  <div className="absolute left-1/2 -translate-x-1/2 bottom-[40px] w-[60px] h-[61px]">
-                    <img src="/assets/loading-circle.svg" alt="completed" className="w-full h-full opacity-60" />
-                  </div>
-                )}
-
-                {event.status === 'IN_PROGRESS' && (
-                  <div className="absolute left-1/2 -translate-x-1/2 bottom-[40px] w-[56px] h-[56px] rotate-90">
-                    <img src="/assets/arrow-up.svg" alt="in progress" className="w-full h-full" />
-                  </div>
-                )}
-              </div>
-            );
-          })}
+              );
+            });
+          })()}
         </div>
 
         {/* Divider Line */}

@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react';
 import { useEventStore } from '@/store/useEventStore';
 import confetti from 'canvas-confetti';
 import { icons, ArrowRight, Clock } from 'lucide-react';
+import RouletteNumber from './RouletteNumber';
 
 const InProgressView = () => {
   const events = useEventStore((s) => s.events);
@@ -70,12 +71,16 @@ const InProgressView = () => {
           <div className="flex items-center justify-center gap-20 w-full">
             <div className="flex flex-col items-center gap-2 flex-1 items-end">
               <span className="text-3xl font-semibold tracking-widest text-primary uppercase">{current.teamA}</span>
-              <span className="font-display text-[12rem] text-foreground leading-none drop-shadow-md">{current.scoreA}</span>
+              <span className="font-display text-[12rem] text-foreground leading-none drop-shadow-md">
+                <RouletteNumber value={current.scoreA} />
+              </span>
             </div>
             <span className="font-display text-7xl text-muted-foreground/30 mb-8">:</span>
             <div className="flex flex-col items-center gap-2 flex-1 items-start">
               <span className="text-3xl font-semibold tracking-widest text-muted-foreground uppercase">{current.teamB}</span>
-              <span className="font-display text-[12rem] text-foreground leading-none drop-shadow-md">{current.scoreB}</span>
+              <span className="font-display text-[12rem] text-foreground leading-none drop-shadow-md">
+                <RouletteNumber value={current.scoreB} />
+              </span>
             </div>
           </div>
 
