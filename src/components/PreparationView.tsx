@@ -39,30 +39,9 @@ const PreparationView = () => {
         className="relative w-[1920px] h-[1080px] shrink-0"
         style={{ transform: `scale(${scale})` }}
       >
-        <TotalScoreBoard />
+        <img src="/assets/background/준비화면-배경.svg" className="absolute inset-0 w-full h-full object-cover -z-10" alt="" />
 
-        {/* Global Pixel Patterns Extracted From Figma */}
-        {[
-          // Right edge complex structure
-          { l: 1888.5, t: 120, s: 31.5 }, { l: 1888.5, t: 309, s: 31.5 }, { l: 1888.5, t: 561, s: 31.5 },
-          { l: 1888.5, t: 372, s: 31.5 }, { l: 1888.5, t: 624, s: 31.5 }, { l: 1888.5, t: 403.5, s: 31.5 },
-          { l: 1888.5, t: 214.5, s: 31.5 }, { l: 1888.5, t: 466.5, s: 31.5 }, { l: 1888.5, t: 246, s: 31.5 },
-          { l: 1888.5, t: 498, s: 31.5 },
-          { l: 1857, t: 151.5, s: 31.5 }, { l: 1857, t: 340.5, s: 31.5 }, { l: 1857, t: 592.5, s: 31.5 },
-          { l: 1857, t: 403.5, s: 31.5 }, { l: 1857, t: 183, s: 31.5 }, { l: 1857, t: 435, s: 31.5 },
-          { l: 1857, t: 466.5, s: 31.5 }, { l: 1825.5, t: 120.15, s: 31.5 },
-          // Left edge complex structure
-          { l: 29.5, t: 951.5, s: 29.5 }, { l: 0, t: 804, s: 29.5 }, { l: 29.5, t: 774.5, s: 29.5 },
-          { l: 0, t: 745, s: 29.5 }, { l: 29.5, t: 715.5, s: 29.5 }, { l: 0, t: 715.5, s: 29.5 },
-          { l: 29.5, t: 922, s: 29.5 }, { l: 29.5, t: 686, s: 29.5 }, { l: 0, t: 892.5, s: 29.5 },
-          { l: 29.5, t: 656.5, s: 29.5 }, { l: 0, t: 656.5, s: 29.5 }, { l: 0, t: 863, s: 29.5 }
-        ].map((dot, idx) => (
-          <div
-            key={idx}
-            className="absolute bg-[#ff40c2]"
-            style={{ left: `${dot.l}px`, top: `${dot.t}px`, width: `${dot.s}px`, height: `${dot.s}px` }}
-          />
-        ))}
+        <TotalScoreBoard />
 
         {/* Content Box (Left) */}
         <div className="absolute top-[120px] left-0 w-[916px] h-[861px]">
@@ -72,11 +51,6 @@ const PreparationView = () => {
           <p className="absolute font-['Pretendard'] font-extrabold leading-tight left-[71.3px] text-[205.4px] text-white top-[362.1px] whitespace-nowrap m-0 tracking-tighter w-[800px] break-keep">
             {nextEvent.name}
           </p>
-        </div>
-
-        {/* Vertical Divider 1 */}
-        <div className="absolute left-[916px] top-[120px] w-[1px] h-[535px] bg-transparent">
-          <img alt="" className="absolute inset-0 size-[2000%] max-w-none object-cover" src="/assets/vector16.svg" />
         </div>
 
         {/* Content Box (Right Top) */}
@@ -92,16 +66,6 @@ const PreparationView = () => {
             <span>{minutes}</span>
             <span>{seconds}</span>
           </div>
-        </div>
-
-        {/* Horizontal Divider */}
-        <div className="absolute top-[655px] left-0 w-[1920px] h-[1px]">
-          <img alt="" className="absolute inset-0 size-full object-cover" src="/assets/vector13.svg" />
-        </div>
-
-        {/* Vertical Divider 2 */}
-        <div className="absolute left-[1046px] top-[655px] w-[1px] h-[326px]">
-          <img alt="" className="absolute inset-0 size-[2000%] max-w-none object-cover" src="/assets/vector15.svg" />
         </div>
 
         {/* Content Box (Left Bottom) */}
@@ -125,35 +89,6 @@ const PreparationView = () => {
           <div className="absolute font-['Pretendard'] font-bold leading-tight left-[154px] text-[80px] text-white top-[82px] m-0 tracking-tight flex flex-col">
             <span>선수분들은 준비해</span>
             <span>주시길 바랍니다.</span>
-          </div>
-        </div>
-
-        {/* Footer from Figma */}
-        <div className="absolute bg-[#111] flex flex-col h-[99px] items-center left-0 overflow-clip top-[981px] w-[1920px]">
-          <div className="h-0 relative shrink-0 w-[1920px]">
-            <div className="absolute inset-[-1.25px_0]">
-              <img alt="" className="block max-w-none size-full" src="/assets/notice-footer-line.svg" />
-            </div>
-          </div>
-          <div className="flex flex-[1_0_0] items-center justify-between px-[30px] w-full">
-            <div className="h-[24.712px] relative shrink-0 w-[170.43px]">
-              <img alt="Logo 1" className="absolute inset-0 max-w-none object-cover pointer-events-none size-full" src="/assets/notice-footer-1.png" />
-            </div>
-            <div className="h-[34.177px] relative shrink-0 w-[60.413px]">
-              <img alt="Center" className="absolute block inset-0 max-w-none size-full" src="/assets/notice-footer-2.svg" />
-            </div>
-            <div className="flex gap-[6.843px] items-center justify-center relative shrink-0">
-              <div className="h-[32.424px] relative shrink-0 w-[23.53px]">
-                <div className="absolute inset-0 overflow-hidden pointer-events-none">
-                  <img alt="Logo 2" className="absolute h-[606%] left-[-670.26%] max-w-none top-[-252.7%] w-[2361.16%]" src="/assets/notice-footer-3.png" />
-                </div>
-              </div>
-              <div className="h-[32.424px] relative shrink-0 w-[215.326px]">
-                <div className="absolute inset-0 overflow-hidden pointer-events-none">
-                  <img alt="Logo 3" className="absolute h-[606%] left-[-86.73%] max-w-none top-[-252.7%] w-[258.02%]" src="/assets/notice-footer-4.png" />
-                </div>
-              </div>
-            </div>
           </div>
         </div>
 

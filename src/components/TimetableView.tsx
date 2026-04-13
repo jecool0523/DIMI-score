@@ -43,6 +43,8 @@ const TimetableView = () => {
         className="relative w-[1920px] h-[1080px] shrink-0"
         style={{ transform: `scale(${scale})` }}
       >
+        <img src="/assets/background/기본 화면(개막식) - 배경.svg" className="absolute inset-0 w-full h-full object-cover -z-10" alt="" />
+
         <TotalScoreBoard />
 
         {/* Vertical stripes for events */}
@@ -73,7 +75,6 @@ const TimetableView = () => {
 
             return effectiveEvents.map((event, index) => {
               const isPink = index % 2 === 0;
-              const bgClass = isPink ? 'bg-[#ff40c3]' : 'bg-black';
               const textClass = isPink ? 'text-black' : 'text-[#ff40c2]';
               const iconTop = !isPink; // Top if black, bottom if pink
               const isCompleted = event.effectiveStatus === 'COMPLETED';
@@ -83,7 +84,7 @@ const TimetableView = () => {
                 <div
                   key={event.id}
                   onClick={(e) => handleClick(e, event)}
-                  className={`relative overflow-hidden flex-[1_1_100%] cursor-pointer transition-transform active:scale-95 ${bgClass}`}
+                  className={`relative flex-[1_1_100%] cursor-pointer transition-transform active:scale-95 bg-transparent`}
                 >
                   {/* Event Name */}
                   <div className={`absolute top-[40px] left-1/2 -translate-x-1/2 flex flex-col items-center font-['Pretendard'] font-extrabold text-[80px] leading-[0.8] select-none whitespace-nowrap z-0 ${textClass}`}>
@@ -115,44 +116,10 @@ const TimetableView = () => {
           })()}
         </div>
 
-        {/* Divider Line */}
-        <div className="absolute top-[650px] left-0 w-[1920px] h-[1px]">
-          <img alt="" className="w-full h-full object-cover" src="/assets/vector13.svg" />
-        </div>
-
         {/* Big Clock */}
-        <p className="absolute left-1/2 -translate-x-1/2 top-[685px] font-display text-[432px] text-white leading-none tracking-[0.05em] m-0 whitespace-nowrap tabular-nums">
+        <p className="absolute left-1/2 -translate-x-1/2 top-[685px] font-display text-[432px] text-white leading-none tracking-[0.05em] m-0 whitespace-nowrap tabular-nums z-10 pointer-events-none shadow-none">
           {hours}:{minutes}:{seconds}
         </p>
-
-        {/* Footer from Figma */}
-        <div className="absolute bg-[#111] flex flex-col h-[99px] items-center left-0 overflow-clip top-[981px] w-[1920px]">
-          <div className="h-0 relative shrink-0 w-[1920px]">
-            <div className="absolute inset-[-1.25px_0]">
-              <img alt="" className="block max-w-none size-full" src="/assets/notice-footer-line.svg" />
-            </div>
-          </div>
-          <div className="flex flex-[1_0_0] items-center justify-between px-[30px] w-full">
-            <div className="h-[24.712px] relative shrink-0 w-[170.43px]">
-              <img alt="Logo 1" className="absolute inset-0 max-w-none object-cover pointer-events-none size-full" src="/assets/notice-footer-1.png" />
-            </div>
-            <div className="h-[34.177px] relative shrink-0 w-[60.413px]">
-              <img alt="Center Footer Icon" className="absolute block inset-0 max-w-none size-full" src="/assets/notice-footer-2.svg" />
-            </div>
-            <div className="flex gap-[6.843px] items-center justify-center relative shrink-0">
-              <div className="h-[32.424px] relative shrink-0 w-[23.53px]">
-                <div className="absolute inset-0 overflow-hidden pointer-events-none">
-                  <img alt="Logo 2" className="absolute h-[606%] left-[-670.26%] max-w-none top-[-252.7%] w-[2361.16%]" src="/assets/notice-footer-3.png" />
-                </div>
-              </div>
-              <div className="h-[32.424px] relative shrink-0 w-[215.326px]">
-                <div className="absolute inset-0 overflow-hidden pointer-events-none">
-                  <img alt="Logo 3" className="absolute h-[606%] left-[-86.73%] max-w-none top-[-252.7%] w-[258.02%]" src="/assets/notice-footer-4.png" />
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
 
       </div>
     </div>

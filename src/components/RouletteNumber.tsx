@@ -7,7 +7,7 @@ const Digit = ({ value, index }: { value: string, index: number }) => {
 
     const target = Number(value);
     return (
-        <div className="relative inline-flex flex-col h-[1em] overflow-hidden leading-[1em]">
+        <div className="relative inline-flex flex-col h-[1.3em] overflow-hidden leading-[1.3em]">
             <div
                 className="flex flex-col transition-transform duration-[1000ms]"
                 style={{
@@ -17,7 +17,7 @@ const Digit = ({ value, index }: { value: string, index: number }) => {
                 }}
             >
                 {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map((n) => (
-                    <span key={n} className="h-[1em] leading-[1em] flex-none inline-flex items-center justify-center">{n}</span>
+                    <span key={n} className="h-[1.3em] leading-[1.3em] flex-none inline-flex items-center justify-center pb-[0.05em]">{n}</span>
                 ))}
             </div>
         </div>

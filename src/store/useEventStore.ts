@@ -20,11 +20,15 @@ interface EventStore {
   announcement: string;
   announcementTimestamp: number;
   events: SportEvent[];
+  bonusScoreA: number;
+  bonusScoreB: number;
   setViewMode: (mode: ViewMode) => void;
   setAnnouncement: (text: string) => void;
   setEventStatus: (id: string, status: EventStatus) => void;
   updateScore: (id: string, team: 'A' | 'B', delta: number) => void;
   resetScore: (id: string) => void;
+  updateBonusScore: (team: 'A' | 'B', delta: number) => void;
+  resetBonusScore: () => void;
 }
 
 const defaultEvents: SportEvent[] = [
@@ -43,6 +47,8 @@ export const useEventStore = create<EventStore>((set) => ({
   announcement: '🎉 제25회 체육대회에 오신 것을 환영합니다! 안전하고 즐거운 대회가 되길 바랍니다.',
   announcementTimestamp: 0,
   events: defaultEvents,
+  bonusScoreA: 0,
+  bonusScoreB: 0,
 
   setViewMode: (mode) => set({ viewMode: mode }),
   setAnnouncement: (text) => set({ announcement: text, announcementTimestamp: Date.now() }),
@@ -65,6 +71,14 @@ export const useEventStore = create<EventStore>((set) => ({
     set((state) => ({
       events: state.events.map((e) => (e.id === id ? { ...e, scoreA: 0, scoreB: 0 } : e)),
     })),
+
+  updateBonusScore: (team, delta) =>
+    set((state) => ({
+      bonusScoreA: team === 'A' ? state.bonusScoreA + delta : state.bonusScoreA,
+      bonusScoreB: team === 'B' ? state.bonusScoreB + delta : state.bonusScoreB,
+    })),
+
+  resetBonusScore: () => set({ bonusScoreA: 0, bonusScoreB: 0 }),
 }));
 
 // Cross-tab synchronization via BroadcastChannel
@@ -84,6 +98,8 @@ useEventStore.subscribe((state) => {
       announcement: state.announcement,
       announcementTimestamp: state.announcementTimestamp,
       events: state.events,
+      bonusScoreA: state.bonusScoreA,
+      bonusScoreB: state.bonusScoreB,
     });
   }
 });

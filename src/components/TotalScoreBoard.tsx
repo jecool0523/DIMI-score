@@ -5,9 +5,11 @@ import RouletteNumber from './RouletteNumber';
 
 const TotalScoreBoard = () => {
   const events = useEventStore((s) => s.events);
+  const bonusScoreA = useEventStore((s) => s.bonusScoreA);
+  const bonusScoreB = useEventStore((s) => s.bonusScoreB);
 
-  let totalA = 0;
-  let totalB = 0;
+  let totalA = bonusScoreA;
+  let totalB = bonusScoreB;
   events.forEach((e) => {
     if (e.teamA && e.teamB) {
       totalA += e.scoreA;
@@ -45,33 +47,14 @@ const TotalScoreBoard = () => {
   }, [totalB]);
 
   return (
-    <div className="w-full flex justify-center mb-8 bg-transparent overflow-hidden">
-      <div className="content-stretch flex items-center relative w-[1920px] shrink-0 h-[120px]">
-        <div className="bg-[#04f] h-[120px] overflow-clip relative shrink-0 w-[1014px]">
-          <div className="absolute bg-white left-[994px] size-[20px] top-0" />
-          <div className="absolute bg-white left-[994px] size-[20px] top-[20px]" />
-          <div className="absolute bg-white left-[974px] size-[20px] top-[20px]" />
-          <div className="absolute bg-white left-[974px] size-[20px] top-[60px]" />
-          <div className="absolute bg-white left-[994px] size-[20px] top-[60px]" />
+    <div className="w-full flex justify-center bg-transparent z-10 absolute top-0 left-0 pointer-events-none">
+      <div className="content-stretch flex items-center relative w-[1920px] shrink-0 h-[120px] bg-transparent">
+        <div className="h-[120px] relative shrink-0 w-[1014px] bg-transparent">
           <div className="absolute font-display font-bold leading-[normal] left-[40px] text-[110px] text-white top-[-5px] whitespace-nowrap m-0">
             <RouletteNumber value={`${totalA.toLocaleString()}P`} />
           </div>
-          <div className="absolute bg-white left-[994px] size-[20px] top-[100px]" />
-          <div className="absolute bg-[#04f] left-[994px] size-[20px] top-[20px]" />
         </div>
-        <div className="bg-white h-[120px] overflow-clip relative shrink-0 w-[906px]">
-          <div className="absolute bg-[#04f] left-0 size-[20px] top-0" />
-          <div className="absolute bg-white left-0 size-[20px] top-[20px]" />
-          <div className="absolute bg-[#04f] left-0 size-[20px] top-[40px]" />
-          <div className="absolute bg-[#04f] left-0 size-[20px] top-[60px]" />
-          <div className="absolute bg-white left-0 size-[20px] top-[80px]" />
-          <div className="absolute bg-[#04f] left-[20px] size-[20px] top-[80px]" />
-          <div className="absolute bg-[#04f] left-[40px] size-[20px] top-[80px]" />
-          <div className="absolute bg-[#04f] left-[40px] size-[20px] top-[60px]" />
-          <div className="absolute bg-[#04f] left-[20px] size-[20px] top-[40px]" />
-          <div className="absolute bg-[#04f] left-[40px] size-[20px] top-[20px]" />
-          <div className="absolute bg-[#04f] left-[20px] size-[20px] top-0" />
-          <div className="absolute bg-[#04f] left-0 size-[20px] top-[100px]" />
+        <div className="h-[120px] relative shrink-0 w-[906px] bg-transparent">
           <div className="absolute font-display font-bold leading-[normal] right-[40px] text-[#04f] text-[110px] top-[-5px] whitespace-nowrap m-0 text-right">
             <RouletteNumber value={`${totalB.toLocaleString()}P`} />
           </div>

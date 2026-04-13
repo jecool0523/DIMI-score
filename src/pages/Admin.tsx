@@ -32,7 +32,7 @@ const AdminPage = () => {
     }
   };
 
-  const { viewMode, setViewMode, events, setEventStatus, updateScore, resetScore, setAnnouncement } = useEventStore();
+  const { viewMode, setViewMode, events, setEventStatus, updateScore, resetScore, setAnnouncement, bonusScoreA, bonusScoreB, updateBonusScore, resetBonusScore } = useEventStore();
   const [announcementInput, setAnnouncementInput] = useState('');
 
   const handleSendAnnouncement = () => {
@@ -42,6 +42,15 @@ const AdminPage = () => {
       toast.success('공지사항이 전송되었습니다.');
     }
   };
+
+  let calculatedTotalA = bonusScoreA;
+  let calculatedTotalB = bonusScoreB;
+  events.forEach((e) => {
+    if (e.teamA && e.teamB) {
+      calculatedTotalA += e.scoreA;
+      calculatedTotalB += e.scoreB;
+    }
+  });
 
   if (!isAuthenticated) {
     return (
@@ -101,17 +110,51 @@ const AdminPage = () => {
         </div>
       </section>
 
+      {/* Global Score control */}
+      <section className="mb-8">
+        <div className="flex items-center justify-between max-w-3xl mb-3">
+          <h2 className="text-xl font-semibold text-muted-foreground">전체 점수판 관리 🏆</h2>
+          <Button size="sm" variant="destructive" onClick={resetBonusScore} className="gap-1 h-8">
+            <RotateCcw size={14} /> 보너스 초기화
+          </Button>
+        </div>
+        <div className="grid grid-cols-2 gap-4 max-w-3xl">
+          <div className="bg-card rounded-lg p-6 border border-border flex items-center justify-between shadow-sm">
+            <div>
+              <p className="text-sm font-semibold text-muted-foreground tracking-widest uppercase">Team A (청팀)</p>
+              <p className="font-display text-6xl text-primary mt-2 leading-none">{calculatedTotalA}</p>
+              <p className="text-[11px] text-muted-foreground/60 mt-3 font-medium">수동 보너스: <span className="text-primary">{bonusScoreA > 0 ? `+${bonusScoreA}` : bonusScoreA}</span></p>
+            </div>
+            <div className="flex flex-col gap-2">
+              <Button variant="outline" size="icon" onClick={() => updateBonusScore('A', 1)}><Plus size={16} /></Button>
+              <Button variant="outline" size="icon" onClick={() => updateBonusScore('A', -1)}><Minus size={16} /></Button>
+            </div>
+          </div>
+          <div className="bg-card rounded-lg p-6 border border-border flex items-center justify-between shadow-sm">
+            <div>
+              <p className="text-sm font-semibold text-muted-foreground tracking-widest uppercase">Team B (백팀)</p>
+              <p className="font-display text-6xl text-primary mt-2 leading-none">{calculatedTotalB}</p>
+              <p className="text-[11px] text-muted-foreground/60 mt-3 font-medium">수동 보너스: <span className="text-primary">{bonusScoreB > 0 ? `+${bonusScoreB}` : bonusScoreB}</span></p>
+            </div>
+            <div className="flex flex-col gap-2">
+              <Button variant="outline" size="icon" onClick={() => updateBonusScore('B', 1)}><Plus size={16} /></Button>
+              <Button variant="outline" size="icon" onClick={() => updateBonusScore('B', -1)}><Minus size={16} /></Button>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Announcement */}
       <section className="mb-8">
         <h2 className="text-xl font-semibold text-muted-foreground mb-3">공지사항</h2>
-        <div className="flex gap-3 max-w-xl">
+        <div className="flex gap-3 max-w-3xl">
           <Input
             value={announcementInput}
             onChange={(e) => setAnnouncementInput(e.target.value)}
             placeholder="공지 내용을 입력하세요..."
             onKeyDown={(e) => e.key === 'Enter' && handleSendAnnouncement()}
           />
-          <Button onClick={handleSendAnnouncement} className="gap-2">
+          <Button onClick={handleSendAnnouncement} className="gap-2 shrink-0">
             <Send size={16} /> 전송
           </Button>
         </div>
@@ -128,8 +171,8 @@ const AdminPage = () => {
                   <span className="text-muted-foreground font-mono">{event.time}</span>
                   <span className="font-display text-lg text-foreground">{event.name}</span>
                   <span className={`text-sm px-2 py-0.5 rounded ${event.status === 'COMPLETED' ? 'bg-completed text-completed-foreground' :
-                      event.status === 'IN_PROGRESS' ? 'bg-inprogress/20 text-inprogress' :
-                        'bg-secondary text-muted-foreground'
+                    event.status === 'IN_PROGRESS' ? 'bg-inprogress/20 text-inprogress' :
+                      'bg-secondary text-muted-foreground'
                     }`}>
                     {event.status === 'COMPLETED' ? '완료' : event.status === 'IN_PROGRESS' ? '진행중' : '예정'}
                   </span>
