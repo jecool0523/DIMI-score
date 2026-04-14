@@ -61,34 +61,53 @@
   * {
     @apply border-border;
   }
+
   body {
     @apply bg-background text-foreground;
-    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    font-family: 'Pretendard', system-ui, -apple-system, sans-serif;
   }
 }
 
 @layer utilities {
   .font-display {
-    font-family: 'Inter', system-ui, -apple-system, sans-serif;
-    font-weight: 900;
-    letter-spacing: -0.04em;
-    font-style: italic;
+    font-family: 'USN_Stencil', 'Pretendard', system-ui, -apple-system, sans-serif;
+    font-weight: 400;
+    font-style: normal;
   }
 }
 
 @keyframes marquee {
-  0% { transform: translateX(100%); }
-  100% { transform: translateX(-100%); }
+  0% {
+    transform: translateX(100%);
+  }
+
+  100% {
+    transform: translateX(-100%);
+  }
 }
 
 @keyframes pulse-glow {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.5;
+  }
 }
 
 @keyframes border-blink {
-  0%, 100% { border-color: hsl(var(--inprogress)); }
-  50% { border-color: transparent; }
+
+  0%,
+  100% {
+    border-color: hsl(var(--inprogress));
+  }
+
+  50% {
+    border-color: transparent;
+  }
 }
 
 .animate-marquee {

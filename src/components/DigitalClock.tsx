@@ -14,7 +14,7 @@ const DigitalClock = () => {
 
   return (
     <div className="flex flex-col items-center">
-      <span className="font-display text-[8rem] leading-none tracking-tighter text-foreground tabular-nums">
+      <span className="font-['Pretendard'] text-[8rem] leading-none tracking-tighter text-foreground tabular-nums">
         {hours}:{minutes}:{seconds}
       </span>
     </div>

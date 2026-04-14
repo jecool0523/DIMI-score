@@ -369,7 +369,7 @@ export default function AnnouncementOverlay({ show, announcement }: Announcement
                     <img alt="Warning Icon" className="absolute block inset-0 max-w-none size-full" src="/assets/notice-icon.svg" />
                 </div>
 
-                <div className="-translate-x-1/2 absolute font-display leading-[1.5] left-1/2 text-center text-white top-[618.03px] tracking-[1.64px] w-[1500px]">
+                <div className="-translate-x-1/2 absolute font-['Pretendard'] leading-[1.5] left-1/2 text-center text-white top-[618.03px] tracking-[1.64px] w-[1500px]">
                     <p className="text-[82px] mb-0 whitespace-pre-line font-bold drop-shadow-lg break-keep">{announcement}</p>
                 </div>
 

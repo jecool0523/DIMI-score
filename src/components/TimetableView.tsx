@@ -86,13 +86,6 @@ const TimetableView = () => {
                   onClick={(e) => handleClick(e, event)}
                   className={`relative flex-[1_1_100%] cursor-pointer transition-transform active:scale-95 bg-transparent`}
                 >
-                  {/* Event Name */}
-                  <div className={`absolute top-[40px] left-1/2 -translate-x-1/2 flex flex-col items-center font-['Pretendard'] font-extrabold text-[80px] leading-[0.8] select-none whitespace-nowrap z-0 ${textClass}`}>
-                    {event.name.split('').map((char, i) => (
-                      <span key={i} className="mb-2">{char}</span>
-                    ))}
-                  </div>
-
                   {/* Dim Overlay */}
                   {isCompleted && (
                     <div className="absolute inset-0 bg-black/60 pointer-events-none z-10" />
@@ -117,7 +110,7 @@ const TimetableView = () => {
         </div>
 
         {/* Big Clock */}
-        <p className="absolute left-1/2 -translate-x-1/2 top-[685px] font-display text-[432px] text-white leading-none tracking-[0.05em] m-0 whitespace-nowrap tabular-nums z-10 pointer-events-none shadow-none">
+        <p className="absolute left-1/2 -translate-x-1/2 top-[685px] font-['Pretendard'] text-[432px] text-white leading-none tracking-[0.05em] m-0 whitespace-nowrap tabular-nums z-10 pointer-events-none shadow-none">
           {hours}:{minutes}:{seconds}
         </p>
 

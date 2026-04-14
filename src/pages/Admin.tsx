@@ -60,7 +60,7 @@ const AdminPage = () => {
             <div className="bg-primary/10 p-3 rounded-full mb-4">
               <Lock className="text-primary" size={24} />
             </div>
-            <h1 className="font-display text-2xl font-semibold text-foreground text-center">관리자 로그인</h1>
+            <h1 className="font-['Pretendard'] text-2xl font-semibold text-foreground text-center">관리자 로그인</h1>
             <p className="text-sm text-muted-foreground text-center mt-2">페이지에 접근하려면 비밀번호를 입력해주세요.</p>
           </div>
           <form onSubmit={handleLogin} className="space-y-4">
@@ -82,7 +82,7 @@ const AdminPage = () => {
   return (
     <div className="min-h-screen bg-background p-6">
       <div className="flex items-center justify-between mb-6 border-b border-border pb-4">
-        <h1 className="font-display text-3xl text-foreground">⚙️ 컨트롤 패널</h1>
+        <h1 className="font-['Pretendard'] text-3xl text-foreground">⚙️ 컨트롤 패널</h1>
         <Button variant="outline" size="sm" onClick={() => {
           sessionStorage.removeItem('dimi-admin-auth');
           setIsAuthenticated(false);
@@ -122,7 +122,7 @@ const AdminPage = () => {
           <div className="bg-card rounded-lg p-6 border border-border flex items-center justify-between shadow-sm">
             <div>
               <p className="text-sm font-semibold text-muted-foreground tracking-widest uppercase">Team A (청팀)</p>
-              <p className="font-display text-6xl text-primary mt-2 leading-none">{calculatedTotalA}</p>
+              <p className="font-['Pretendard'] text-6xl text-primary mt-2 leading-none">{calculatedTotalA}</p>
               <p className="text-[11px] text-muted-foreground/60 mt-3 font-medium">수동 보너스: <span className="text-primary">{bonusScoreA > 0 ? `+${bonusScoreA}` : bonusScoreA}</span></p>
             </div>
             <div className="flex flex-col gap-2">
@@ -133,7 +133,7 @@ const AdminPage = () => {
           <div className="bg-card rounded-lg p-6 border border-border flex items-center justify-between shadow-sm">
             <div>
               <p className="text-sm font-semibold text-muted-foreground tracking-widest uppercase">Team B (백팀)</p>
-              <p className="font-display text-6xl text-primary mt-2 leading-none">{calculatedTotalB}</p>
+              <p className="font-['Pretendard'] text-6xl text-primary mt-2 leading-none">{calculatedTotalB}</p>
               <p className="text-[11px] text-muted-foreground/60 mt-3 font-medium">수동 보너스: <span className="text-primary">{bonusScoreB > 0 ? `+${bonusScoreB}` : bonusScoreB}</span></p>
             </div>
             <div className="flex flex-col gap-2">
@@ -169,7 +169,7 @@ const AdminPage = () => {
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-3">
                   <span className="text-muted-foreground font-mono">{event.time}</span>
-                  <span className="font-display text-lg text-foreground">{event.name}</span>
+                  <span className="font-['Pretendard'] text-lg text-foreground">{event.name}</span>
                   <span className={`text-sm px-2 py-0.5 rounded ${event.status === 'COMPLETED' ? 'bg-completed text-completed-foreground' :
                     event.status === 'IN_PROGRESS' ? 'bg-inprogress/20 text-inprogress' :
                       'bg-secondary text-muted-foreground'
@@ -203,7 +203,7 @@ const AdminPage = () => {
                     <Button size="sm" variant="secondary" onClick={() => updateScore(event.id, 'A', -1)}>
                       <Minus size={14} />
                     </Button>
-                    <span className="font-display text-xl w-8 text-center text-foreground">{event.scoreA}</span>
+                    <span className="font-['Pretendard'] text-xl w-8 text-center text-foreground">{event.scoreA}</span>
                     <Button size="sm" variant="secondary" onClick={() => updateScore(event.id, 'A', 1)}>
                       <Plus size={14} />
                     </Button>
@@ -214,7 +214,7 @@ const AdminPage = () => {
                     <Button size="sm" variant="secondary" onClick={() => updateScore(event.id, 'B', -1)}>
                       <Minus size={14} />
                     </Button>
-                    <span className="font-display text-xl w-8 text-center text-foreground">{event.scoreB}</span>
+                    <span className="font-['Pretendard'] text-xl w-8 text-center text-foreground">{event.scoreB}</span>
                     <Button size="sm" variant="secondary" onClick={() => updateScore(event.id, 'B', 1)}>
                       <Plus size={14} />
                     </Button>
