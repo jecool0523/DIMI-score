@@ -50,12 +50,12 @@ const TotalScoreBoard = () => {
     <div className="w-full flex justify-center bg-transparent z-10 absolute top-0 left-0 pointer-events-none">
       <div className="content-stretch flex items-center relative w-[1920px] shrink-0 h-[120px] bg-transparent">
         <div className="h-[120px] relative shrink-0 w-[1014px] bg-transparent">
-          <div className="absolute font-['Pretendard'] font-bold leading-[normal] left-[40px] text-[110px] text-white top-[-5px] whitespace-nowrap m-0">
+          <div className="absolute font-sans font-bold leading-[normal] left-[40px] text-[110px] text-white top-[-5px] whitespace-nowrap m-0">
             <RouletteNumber value={`${totalA.toLocaleString()}P`} />
           </div>
         </div>
         <div className="h-[120px] relative shrink-0 w-[906px] bg-transparent">
-          <div className="absolute font-['Pretendard'] font-bold leading-[normal] right-[40px] text-[#04f] text-[110px] top-[-5px] whitespace-nowrap m-0 text-right">
+          <div className="absolute font-sans font-bold leading-[normal] right-[40px] text-[#04f] text-[110px] top-[-5px] whitespace-nowrap m-0 text-right">
             <RouletteNumber value={`${totalB.toLocaleString()}P`} />
           </div>
         </div>

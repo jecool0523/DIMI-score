@@ -110,7 +110,7 @@ const TimetableView = () => {
         </div>
 
         {/* Big Clock */}
-        <p className="absolute left-1/2 -translate-x-1/2 top-[685px] font-['Pretendard'] text-[432px] text-white leading-none tracking-[0.05em] m-0 whitespace-nowrap tabular-nums z-10 pointer-events-none shadow-none">
+        <p className="absolute left-1/2 -translate-x-1/2 top-[685px] font-sans text-[432px] text-white leading-none tracking-[0.05em] m-0 whitespace-nowrap tabular-nums z-10 pointer-events-none shadow-none">
           {hours}:{minutes}:{seconds}
         </p>
 

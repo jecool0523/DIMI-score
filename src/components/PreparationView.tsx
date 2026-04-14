@@ -28,7 +28,7 @@ const PreparationView = () => {
   if (!nextEvent) {
     return (
       <div className="fixed inset-0 z-40 bg-[#0a0a0a] flex items-center justify-center animate-in fade-in duration-500">
-        <p className="font-['Pretendard'] text-5xl text-white">더 이상 진행할 종목이 없습니다 🎉</p>
+        <p className="font-sans text-5xl text-white">더 이상 진행할 종목이 없습니다 🎉</p>
       </div>
     );
   }
@@ -45,7 +45,7 @@ const PreparationView = () => {
 
         {/* Content Box (Left) */}
         <div className="absolute top-[120px] left-0 w-[916px] h-[861px]">
-          <p className="absolute font-['Pretendard'] font-extrabold leading-tight left-[71.3px] text-[205.4px] text-white top-[362.1px] whitespace-nowrap m-0 tracking-tighter w-[800px] break-keep">
+          <p className="absolute font-sans font-extrabold leading-tight left-[71.3px] text-[205.4px] text-white top-[362.1px] whitespace-nowrap m-0 tracking-tighter w-[800px] break-keep">
             {nextEvent.name}
           </p>
         </div>
@@ -55,7 +55,7 @@ const PreparationView = () => {
           {/* Blackout rect hiding baked-in SVG clock numbers ensuring clean dynamic text rendering */}
           <div className="absolute right-[0px] top-[140px] w-[400px] h-[400px] bg-[#0a0a0a] z-0" />
 
-          <div className="absolute font-['Pretendard'] leading-[1] right-[128.3px] text-[#ff40c2] text-[171.6px] text-right top-[164.4px] m-0 flex flex-col tracking-widest tabular-nums gap-0 z-10">
+          <div className="absolute font-sans leading-[1] right-[128.3px] text-[#ff40c2] text-[171.6px] text-right top-[164.4px] m-0 flex flex-col tracking-widest tabular-nums gap-0 z-10">
             <span>{hours}</span>
             <span>{minutes}</span>
             <span>{seconds}</span>
