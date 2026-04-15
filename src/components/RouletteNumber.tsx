@@ -2,7 +2,7 @@ import React from 'react';
 
 const Digit = ({ value, index }: { value: string, index: number }) => {
     if (isNaN(Number(value))) {
-        return <span className="inline-flex h-[1.3em] items-center justify-center pb-[0.05em] font-['USN_Stencil']">{value}</span>;
+        return <span className="inline-flex h-[1.3em] items-center justify-center pb-[0.05em] font-sans">{value}</span>;
     }
 
     const target = Number(value);
@@ -17,7 +17,7 @@ const Digit = ({ value, index }: { value: string, index: number }) => {
                 }}
             >
                 {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map((n) => (
-                    <span key={n} className="h-[1.3em] flex-none inline-flex items-center justify-center pb-[0.05em] font-['USN_Stencil']">{n}</span>
+                    <span key={n} className="h-[1.3em] flex-none inline-flex items-center justify-center pb-[0.05em] font-sans">{n}</span>
                 ))}
             </div>
         </div>
@@ -27,7 +27,7 @@ const Digit = ({ value, index }: { value: string, index: number }) => {
 const RouletteNumber = ({ value }: { value: string | number }) => {
     const str = value.toString();
     return (
-        <div className="flex font-['USN_Stencil']">
+        <div className="flex font-sans">
             {str.split('').map((char, i) => (
                 <Digit key={`${str.length - i}-${i}`} value={char} index={str.length - i} />
             ))}

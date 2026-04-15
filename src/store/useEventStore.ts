@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 
 export type EventStatus = 'UPCOMING' | 'IN_PROGRESS' | 'COMPLETED';
 export type ViewMode = 'TIMETABLE' | 'IN_PROGRESS' | 'PREPARATION';
@@ -42,44 +43,51 @@ const defaultEvents: SportEvent[] = [
   { id: '8', name: '폐회식', time: '14:00', icon: 'Trophy', status: 'UPCOMING', scoreA: 0, scoreB: 0 },
 ];
 
-export const useEventStore = create<EventStore>((set) => ({
-  viewMode: 'TIMETABLE',
-  announcement: '🎉 제25회 체육대회에 오신 것을 환영합니다! 안전하고 즐거운 대회가 되길 바랍니다.',
-  announcementTimestamp: 0,
-  events: defaultEvents,
-  bonusScoreA: 0,
-  bonusScoreB: 0,
+export const useEventStore = create<EventStore>()(
+  persist(
+    (set) => ({
+      viewMode: 'TIMETABLE',
+      announcement: '🎉 제25회 체육대회에 오신 것을 환영합니다! 안전하고 즐거운 대회가 되길 바랍니다.',
+      announcementTimestamp: 0,
+      events: defaultEvents,
+      bonusScoreA: 0,
+      bonusScoreB: 0,
 
-  setViewMode: (mode) => set({ viewMode: mode }),
-  setAnnouncement: (text) => set({ announcement: text, announcementTimestamp: Date.now() }),
+      setViewMode: (mode) => set({ viewMode: mode }),
+      setAnnouncement: (text) => set({ announcement: text, announcementTimestamp: Date.now() }),
 
-  setEventStatus: (id, status) =>
-    set((state) => ({
-      events: state.events.map((e) => (e.id === id ? { ...e, status } : e)),
-    })),
+      setEventStatus: (id, status) =>
+        set((state) => ({
+          events: state.events.map((e) => (e.id === id ? { ...e, status } : e)),
+        })),
 
-  updateScore: (id, team, delta) =>
-    set((state) => ({
-      events: state.events.map((e) => {
-        if (e.id !== id) return e;
-        if (team === 'A') return { ...e, scoreA: Math.max(0, e.scoreA + delta) };
-        return { ...e, scoreB: Math.max(0, e.scoreB + delta) };
-      }),
-    })),
+      updateScore: (id, team, delta) =>
+        set((state) => ({
+          events: state.events.map((e) => {
+            if (e.id !== id) return e;
+            if (team === 'A') return { ...e, scoreA: Math.max(0, e.scoreA + delta) };
+            return { ...e, scoreB: Math.max(0, e.scoreB + delta) };
+          }),
+        })),
 
-  resetScore: (id) =>
-    set((state) => ({
-      events: state.events.map((e) => (e.id === id ? { ...e, scoreA: 0, scoreB: 0 } : e)),
-    })),
+      resetScore: (id) =>
+        set((state) => ({
+          events: state.events.map((e) => (e.id === id ? { ...e, scoreA: 0, scoreB: 0 } : e)),
+        })),
 
-  updateBonusScore: (team, delta) =>
-    set((state) => ({
-      bonusScoreA: team === 'A' ? state.bonusScoreA + delta : state.bonusScoreA,
-      bonusScoreB: team === 'B' ? state.bonusScoreB + delta : state.bonusScoreB,
-    })),
+      updateBonusScore: (team, delta) =>
+        set((state) => ({
+          bonusScoreA: team === 'A' ? state.bonusScoreA + delta : state.bonusScoreA,
+          bonusScoreB: team === 'B' ? state.bonusScoreB + delta : state.bonusScoreB,
+        })),
 
-  resetBonusScore: () => set({ bonusScoreA: 0, bonusScoreB: 0 }),
-}));
+      resetBonusScore: () => set({ bonusScoreA: 0, bonusScoreB: 0 }),
+    }),
+    {
+      name: 'dimi-score-storage',
+    }
+  )
+);
 
 // Cross-tab synchronization via BroadcastChannel
 const channel = new BroadcastChannel('dimi-score-sync');

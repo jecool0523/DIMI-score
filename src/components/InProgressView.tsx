@@ -78,31 +78,50 @@ const InProgressView = () => {
 
         <TotalScoreBoard />
 
-        {/* Title Row */}
-        <div className="absolute top-[92px] left-[125px] w-[600px] h-[190px] flex items-center justify-center">
-          <div className="font-sans font-extrabold text-[130px] text-black whitespace-nowrap m-0 tracking-tight">
-            {current.name}
+        {/* Unified Header: [Event Name] [Icons] [Clock] */}
+        <div className="absolute top-[200px] left-0 w-[1920px] h-[100px] flex items-center z-30">
+          {/* Event Name */}
+          <div className="flex-1 flex justify-center">
+            <div className="font-sans font-extrabold text-[130px] text-black whitespace-nowrap m-0 tracking-tight">
+              {current.name}
+            </div>
           </div>
-        </div>
 
-        {/* Clock Text */}
-        <div className="absolute top-[99px] left-[1091px] w-[700px] h-[190px] flex items-center justify-center">
-          <div className="font-sans text-[152.68px] text-black whitespace-nowrap m-0 tabular-nums font-[400] leading-none">
-            {hours}:{minutes}:{seconds}
+          {/* Icons Group - Centered & Narrower */}
+          <div className="relative w-[480px] h-[100px] flex items-center justify-center">
+            {/* Left Arrow */}
+            <div className="absolute left-0 w-[100px] h-[100px] -rotate-90">
+              <img src="/assets/match-arrow.svg" className="w-full h-full" alt="" />
+            </div>
+            {/* Loop Icon */}
+            <div className="w-[143px] h-[81px]">
+              <img src="/assets/match-loop.svg" className="w-full h-full" alt="" />
+            </div>
+            {/* Right Arrow */}
+            <div className="absolute right-0 w-[100px] h-[100px] rotate-90">
+              <img src="/assets/match-arrow.svg" className="w-full h-full" alt="" />
+            </div>
+          </div>
+
+          {/* Clock Text */}
+          <div className="flex-1 flex justify-center">
+            <div className="font-sans text-[152.68px] text-black whitespace-nowrap m-0 tabular-nums font-[400] leading-none text-center">
+              {hours}:{minutes}:{seconds}
+            </div>
           </div>
         </div>
 
         {/* Main Center Area */}
-        <div className="absolute top-[412.37px] left-0 w-[1920px] overflow-hidden flex items-center justify-between">
+        <div className="absolute top-[470px] left-0 w-[1920px] overflow-hidden flex items-center justify-between">
           <div className="flex flex-[1_0_0] items-center justify-center gap-[632px] px-[280px]">
-            <div className="w-[235px] h-[313px] flex items-center justify-center pt-[50px]">
-              <span className="font-sans text-[300px] text-black tabular-nums drop-shadow-md pb-[70px]">
+            <div className="w-[300px] h-[450px] flex items-center justify-center pt-[20px]">
+              <span className="font-sans text-[500px] text-black tabular-nums drop-shadow-md pb-[40px]">
                 <RouletteNumber value={current.scoreA.toString()} />
               </span>
             </div>
 
-            <div className="w-[235px] h-[313px] flex items-center justify-center pt-[50px]">
-              <span className="font-sans text-[300px] text-black tabular-nums drop-shadow-md pb-[70px]">
+            <div className="w-[300px] h-[450px] flex items-center justify-center pt-[20px]">
+              <span className="font-sans text-[500px] text-black tabular-nums drop-shadow-md pb-[40px]">
                 <RouletteNumber value={current.scoreB.toString()} />
               </span>
             </div>

@@ -4,7 +4,7 @@
 
 @font-face {
   font-family: 'USN_Stencil';
-  src: url('/assets/USN_Stencil.woff') format('woff');
+  src: url('../public/assets/USN_Stencil.woff') format('woff');
   font-weight: normal;
   font-style: normal;
   font-display: swap;
