@@ -69,7 +69,7 @@ const InProgressView = () => {
   const seconds = time.getSeconds().toString().padStart(2, '0');
 
   return (
-    <div className="fixed inset-0 z-40 bg-[#111] overflow-hidden flex items-center justify-center animate-in fade-in duration-500">
+    <div className="fixed inset-0 z-40 bg-white flex items-center justify-center animate-in fade-in duration-500">
       <div
         className="relative w-[1920px] h-[1080px] shrink-0"
         style={{ transform: `scale(${scale})` }}
@@ -80,7 +80,7 @@ const InProgressView = () => {
 
         {/* Title Row */}
         <div className="absolute top-[92px] left-[125px] w-[600px] h-[190px] flex items-center justify-center">
-          <div className="font-sans font-extrabold text-[130px] text-white whitespace-nowrap m-0 tracking-tight">
+          <div className="font-sans font-extrabold text-[130px] text-black whitespace-nowrap m-0 tracking-tight">
             {current.name}
           </div>
         </div>
@@ -94,28 +94,22 @@ const InProgressView = () => {
 
         {/* Clock Text */}
         <div className="absolute top-[99px] left-[1091px] w-[700px] h-[190px] flex items-center justify-center">
-          <div className="font-sans text-[152.68px] text-white whitespace-nowrap m-0 tabular-nums font-[400] leading-none">
+          <div className="font-sans text-[152.68px] text-black whitespace-nowrap m-0 tabular-nums font-[400] leading-none">
             {hours}:{minutes}:{seconds}
           </div>
         </div>
 
         {/* Main Center Area */}
         <div className="absolute top-[412.37px] left-0 w-[1920px] overflow-hidden flex items-center justify-between">
-          <div className="flex flex-[1_0_0] items-center justify-center gap-[301px] px-[280px]">
+          <div className="flex flex-[1_0_0] items-center justify-center gap-[632px] px-[280px]">
             <div className="w-[235px] h-[313px] flex items-center justify-center pt-[50px]">
-              <span className="font-sans text-[300px] text-white tabular-nums drop-shadow-md pb-[70px]">
+              <span className="font-sans text-[300px] text-black tabular-nums drop-shadow-md pb-[70px]">
                 <RouletteNumber value={current.scoreA.toString()} />
               </span>
             </div>
 
-            <div className="h-[399px] w-[58px] flex flex-col items-center justify-center gap-[283px]">
-              {/* Colons */}
-              <div className="w-[58px] h-[58px] bg-[#ff40c2]" />
-              <div className="w-[58px] h-[58px] bg-[#ff40c2]" />
-            </div>
-
             <div className="w-[235px] h-[313px] flex items-center justify-center pt-[50px]">
-              <span className="font-sans text-[300px] text-white tabular-nums drop-shadow-md pb-[70px]">
+              <span className="font-sans text-[300px] text-black tabular-nums drop-shadow-md pb-[70px]">
                 <RouletteNumber value={current.scoreB.toString()} />
               </span>
             </div>

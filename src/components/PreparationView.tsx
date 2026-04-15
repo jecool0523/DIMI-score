@@ -34,7 +34,7 @@ const PreparationView = () => {
   }
 
   return (
-    <div className="fixed inset-0 z-40 bg-[#0a0a0a] overflow-hidden flex items-center justify-center animate-in fade-in duration-500">
+    <div className="fixed inset-0 z-40 bg-white overflow-hidden flex items-center justify-center animate-in fade-in duration-500">
       <div
         className="relative w-[1920px] h-[1080px] shrink-0"
         style={{ transform: `scale(${scale})` }}
@@ -45,7 +45,7 @@ const PreparationView = () => {
 
         {/* Content Box (Left) */}
         <div className="absolute top-[120px] left-0 w-[916px] h-[861px]">
-          <p className="absolute font-sans font-extrabold leading-tight left-[71.3px] text-[205.4px] text-white top-[362.1px] whitespace-nowrap m-0 tracking-tighter w-[800px] break-keep">
+          <p className="absolute font-sans font-extrabold leading-tight left-[71.3px] text-[205.4px] text-black top-[362.1px] whitespace-nowrap m-0 tracking-tighter w-[800px] break-keep">
             {nextEvent.name}
           </p>
         </div>
@@ -53,7 +53,7 @@ const PreparationView = () => {
         {/* Content Box (Right Top) */}
         <div className="absolute top-[120px] left-[917px] w-[1003px] h-[535px]">
           {/* Blackout rect hiding baked-in SVG clock numbers ensuring clean dynamic text rendering */}
-          <div className="absolute right-[0px] top-[140px] w-[400px] h-[400px] bg-[#0a0a0a] z-0" />
+          <div className="absolute right-[0px] top-[140px] w-[400px] h-[400px] bg-white z-0" />
 
           <div className="absolute font-sans leading-[1] right-[128.3px] text-[#ff40c2] text-[171.6px] text-right top-[164.4px] m-0 flex flex-col tracking-widest tabular-nums gap-0 z-10">
             <span>{hours}</span>

@@ -38,7 +38,7 @@ const TimetableView = () => {
   const seconds = time.getSeconds().toString().padStart(2, '0');
 
   return (
-    <div className="fixed inset-0 z-40 bg-[#111] overflow-hidden flex items-center justify-center animate-in fade-in duration-500">
+    <div className="fixed inset-0 z-40 bg-white overflow-hidden flex items-center justify-center animate-in fade-in duration-500">
       <div
         className="relative w-[1920px] h-[1080px] shrink-0"
         style={{ transform: `scale(${scale})` }}
@@ -110,7 +110,7 @@ const TimetableView = () => {
         </div>
 
         {/* Big Clock */}
-        <p className="absolute left-1/2 -translate-x-1/2 top-[685px] font-sans text-[432px] text-white leading-none tracking-[0.05em] m-0 whitespace-nowrap tabular-nums z-10 pointer-events-none shadow-none">
+        <p className="absolute left-1/2 -translate-x-1/2 top-[685px] font-sans text-[432px] text-black leading-none tracking-[0.05em] m-0 whitespace-nowrap tabular-nums z-10 pointer-events-none shadow-none">
           {hours}:{minutes}:{seconds}
         </p>
 
