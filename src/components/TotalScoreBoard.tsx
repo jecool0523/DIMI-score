@@ -68,7 +68,7 @@ const TotalScoreBoard = () => {
           style={{ backgroundColor: BLUE }}
         >
           {/* Left Score (White on Blue) */}
-          <div className="absolute font-['USN_Stencil'] leading-[normal] left-[45px] text-[120px] text-white top-[-10px] whitespace-nowrap m-0 tracking-tighter z-20">
+          <div className="absolute font-['USN_Stencil'] leading-none left-[45px] text-[120px] text-white top-[-10px] whitespace-nowrap m-0 tracking-tighter z-20">
             <RouletteNumber value={`${totalA.toLocaleString()}P`} />
           </div>
 
@@ -91,7 +91,7 @@ const TotalScoreBoard = () => {
           style={{ backgroundColor: WHITE }}
         >
           {/* Right Score (Black on White) */}
-          <div className="absolute font-['USN_Stencil'] leading-[normal] right-[45px] text-black text-[120px] top-[-10px] whitespace-nowrap m-0 text-right tracking-tighter z-20">
+          <div className="absolute font-['USN_Stencil'] leading-none right-[45px] text-black text-[120px] top-[-10px] whitespace-nowrap m-0 text-right tracking-tighter z-20">
             <RouletteNumber value={`${totalB.toLocaleString()}P`} />
           </div>
 
