@@ -38,7 +38,7 @@ const TimetableView = () => {
   const seconds = time.getSeconds().toString().padStart(2, '0');
 
   return (
-    <div className="fixed inset-0 z-40 bg-white overflow-hidden flex items-center justify-center animate-in fade-in duration-500">
+    <div className="fixed inset-0 z-40 bg-background overflow-hidden flex items-center justify-center animate-in fade-in duration-500">
       <div
         className="relative w-[1920px] h-[1080px] shrink-0"
         style={{ transform: `scale(${scale})` }}
@@ -48,7 +48,7 @@ const TimetableView = () => {
         <TotalScoreBoard />
 
         {/* Vertical stripes for events */}
-        <div className="absolute top-[120px] left-0 flex w-[1920px] h-[530px]">
+        <div className="absolute top-[120px] left-0 flex w-[1920px] h-[493px]">
           {(() => {
             const currentTotalMinutes = time.getHours() * 60 + time.getMinutes();
             const getMinutes = (t: string) => {
@@ -58,51 +58,28 @@ const TimetableView = () => {
 
             const effectiveEvents = events.map((ev, idx) => {
               const nextEv = events[idx + 1];
-              // Event is assumed ended if current time has passed the next event's start time
               const isTimeCompleted = nextEv
                 ? currentTotalMinutes >= getMinutes(nextEv.time)
                 : currentTotalMinutes >= getMinutes(ev.time) + 60;
 
               let effStatus = ev.status;
-              // If untouched/UPCOMING but time has naturally progressed past it, visually mark as COMPLETED
               if (effStatus === 'UPCOMING' && isTimeCompleted) {
                 effStatus = 'COMPLETED';
               }
               return { ...ev, effectiveStatus: effStatus };
             });
 
-            const firstUpcomingEvent = effectiveEvents.find((e) => e.effectiveStatus === 'UPCOMING');
-
             return effectiveEvents.map((event, index) => {
-              const isPink = index % 2 === 0;
-              const textClass = isPink ? 'text-black' : 'text-[#ff40c2]';
-              const iconTop = !isPink; // Top if black, bottom if pink
-              const isCompleted = event.effectiveStatus === 'COMPLETED';
-              const isNextEvent = event.effectiveStatus === 'UPCOMING' && event.id === firstUpcomingEvent?.id;
+              const isPink = index % 2 === 1; // Alternating based on image (Stripe 1 is White, 2 is Pink)
+              // White bg -> Magenta text (#ff40c2), Pink bg -> Black text (#000000)
+              const textColor = isPink ? 'text-black' : 'text-[#ff40c2]';
 
               return (
                 <div
                   key={event.id}
                   onClick={(e) => handleClick(e, event)}
-                  className={`relative flex-[1_1_100%] cursor-pointer transition-transform active:scale-95 bg-transparent`}
+                  className={`relative flex-[1_1_100%] cursor-pointer transition-transform active:scale-95 flex flex-col items-center pt-[50.7px] overflow-hidden`}
                 >
-                  {/* Dim Overlay */}
-                  {isCompleted && (
-                    <div className="absolute inset-0 bg-black/60 pointer-events-none z-10" />
-                  )}
-
-                  {/* Status Icons */}
-                  <div className={`absolute left-1/2 -translate-x-1/2 w-[42px] h-[42px] z-20 ${iconTop ? 'top-[40px]' : 'bottom-[40px]'}`}>
-                    {isCompleted && (
-                      <img src="/assets/completed-box.svg" alt="completed" className="w-[42px] h-[42px] absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
-                    )}
-                    {event.effectiveStatus === 'IN_PROGRESS' && (
-                      <img src="/assets/loading-circle.svg" alt="in progress" className="w-[60px] h-[61px] absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 scale-[1.3]" />
-                    )}
-                    {isNextEvent && (
-                      <img src="/assets/arrow-up.svg" alt="upcoming" className="w-[56px] h-[56px] absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rotate-90 scale-125" />
-                    )}
-                  </div>
                 </div>
               );
             });
@@ -110,7 +87,7 @@ const TimetableView = () => {
         </div>
 
         {/* Big Clock */}
-        <p className="absolute left-1/2 -translate-x-1/2 top-[685px] font-sans text-[432px] text-black leading-none tracking-[0.05em] m-0 whitespace-nowrap tabular-nums z-10 pointer-events-none shadow-none">
+        <p className="absolute left-1/2 -translate-x-1/2 top-[580px] font-sans text-[395px] text-black leading-none tracking-[0.05em] m-0 whitespace-nowrap tabular-nums z-10 pointer-events-none shadow-none">
           {hours}:{minutes}:{seconds}
         </p>
 

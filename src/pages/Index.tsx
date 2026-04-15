@@ -41,16 +41,12 @@ const DisplayPage = () => {
       className="min-h-screen flex flex-col bg-background"
       onDoubleClick={handleClick}
     >
-      {/* Clock always on top */}
-      <div className="flex flex-col items-center justify-center py-6">
-        <DigitalClock />
-        {viewMode === 'IN_PROGRESS' && currentEvent && (
-          <div className="flex items-center gap-2 mt-3 bg-secondary/60 px-5 py-1.5 rounded-full border border-border/50 shadow-sm text-muted-foreground text-lg font-medium tracking-wide">
-            <Clock size={16} className="text-primary" />
-            <span>진행 시간: {currentEvent.time} ~ {nextEvent ? nextEvent.time : '종료 시까지'}</span>
-          </div>
-        )}
-      </div>
+      {/* Clock only when no specific view is active */}
+      {!viewMode && (
+        <div className="flex flex-col items-center justify-center py-6">
+          <DigitalClock />
+        </div>
+      )}
 
       {/* Main views */}
       <div className="flex-1 flex flex-col items-center justify-center w-full">

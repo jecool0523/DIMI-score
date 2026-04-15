@@ -69,7 +69,7 @@ const InProgressView = () => {
   const seconds = time.getSeconds().toString().padStart(2, '0');
 
   return (
-    <div className="fixed inset-0 z-40 bg-white flex items-center justify-center animate-in fade-in duration-500">
+    <div className="fixed inset-0 z-40 bg-[#F4F4F4] flex items-center justify-center animate-in fade-in duration-500">
       <div
         className="relative w-[1920px] h-[1080px] shrink-0"
         style={{ transform: `scale(${scale})` }}
@@ -83,13 +83,6 @@ const InProgressView = () => {
           <div className="font-sans font-extrabold text-[130px] text-black whitespace-nowrap m-0 tracking-tight">
             {current.name}
           </div>
-        </div>
-
-        {/* Center Icons */}
-        <div className="absolute top-[121px] left-[772px] flex items-center justify-center gap-[31px]">
-          <img src="/assets/arrow-right-pink.svg" className="size-[100px] rotate-180" alt="" />
-          <img src="/assets/notice-footer-2.svg" className="h-[80px] object-contain" alt="" />
-          <img src="/assets/arrow-right-pink.svg" className="size-[100px]" alt="" />
         </div>
 
         {/* Clock Text */}

@@ -20,7 +20,7 @@ export default function AnnouncementOverlay({ show, announcement }: Announcement
     if (!show) return null;
 
     return (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-white overflow-hidden animate-in fade-in duration-500">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-[#F4F4F4] overflow-hidden animate-in fade-in duration-500">
             <div
                 className="relative w-[1920px] h-[1080px] shrink-0"
                 style={{ transform: `scale(${scale})` }}

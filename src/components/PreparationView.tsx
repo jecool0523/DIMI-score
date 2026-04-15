@@ -34,7 +34,7 @@ const PreparationView = () => {
   }
 
   return (
-    <div className="fixed inset-0 z-40 bg-white overflow-hidden flex items-center justify-center animate-in fade-in duration-500">
+    <div className="fixed inset-0 z-40 bg-[#F4F4F4] overflow-hidden flex items-center justify-center animate-in fade-in duration-500">
       <div
         className="relative w-[1920px] h-[1080px] shrink-0"
         style={{ transform: `scale(${scale})` }}
