@@ -32,7 +32,7 @@ const AdminPage = () => {
     }
   };
 
-  const { viewMode, setViewMode, events, setEventStatus, updateScore, resetScore, setAnnouncement, bonusScoreA, bonusScoreB, updateBonusScore, resetBonusScore } = useEventStore();
+  const { viewMode, setViewMode, events, setEventStatus, updateScore, resetScore, setAnnouncement, bonusScoreA, bonusScoreB, updateBonusScore, resetBonusScore, triggerAnnouncement } = useEventStore();
   const [announcementInput, setAnnouncementInput] = useState('');
 
   const handleSendAnnouncement = () => {
@@ -156,6 +156,12 @@ const AdminPage = () => {
           />
           <Button onClick={handleSendAnnouncement} className="gap-2 shrink-0">
             <Send size={16} /> 전송
+          </Button>
+          <Button variant="secondary" onClick={triggerAnnouncement} className="gap-2 shrink-0">
+            대형 공지 띄우기
+          </Button>
+          <Button variant="outline" onClick={() => setAnnouncement('')} className="gap-2 shrink-0 text-destructive border-destructive hover:bg-destructive/10">
+            초기화
           </Button>
         </div>
       </section>

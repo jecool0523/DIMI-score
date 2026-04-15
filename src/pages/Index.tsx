@@ -38,7 +38,7 @@ const DisplayPage = () => {
 
   return (
     <div
-      className="min-h-screen flex flex-col bg-background"
+      className="min-h-screen flex flex-col bg-[#F4F4F4]"
       onDoubleClick={handleClick}
     >
       {/* Clock only when no specific view is active */}
@@ -56,7 +56,7 @@ const DisplayPage = () => {
       </div>
 
       {/* Marquee Banner */}
-      {viewMode !== 'TIMETABLE' && <MarqueeBanner />}
+      <MarqueeBanner />
 
       {/* Big Announcement Overlay */}
       <AnnouncementOverlay show={showBigAnnouncement} announcement={announcement} />

@@ -30,6 +30,7 @@ interface EventStore {
   resetScore: (id: string) => void;
   updateBonusScore: (team: 'A' | 'B', delta: number) => void;
   resetBonusScore: () => void;
+  triggerAnnouncement: () => void;
 }
 
 const defaultEvents: SportEvent[] = [
@@ -82,6 +83,7 @@ export const useEventStore = create<EventStore>()(
         })),
 
       resetBonusScore: () => set({ bonusScoreA: 0, bonusScoreB: 0 }),
+      triggerAnnouncement: () => set({ announcementTimestamp: Date.now() }),
     }),
     {
       name: 'dimi-score-storage',
