@@ -2,7 +2,7 @@ import React from 'react';
 
 const Digit = ({ value, index }: { value: string, index: number }) => {
     if (isNaN(Number(value))) {
-        return <span className="inline-flex h-[1em] leading-[1em] items-center justify-center">{value}</span>;
+        return <span className="inline-flex h-[1.3em] leading-[1.3em] items-center justify-center pb-[0.05em]">{value}</span>;
     }
 
     const target = Number(value);
