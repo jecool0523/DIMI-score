@@ -34,10 +34,10 @@ const PreparationView = () => {
   }
 
   return (
-    <div className="fixed inset-0 z-40 bg-[#F4F4F4] overflow-hidden flex items-center justify-center animate-in fade-in duration-500">
+    <div className="fixed inset-0 z-40 bg-[#F4F4F4] overflow-hidden flex items-start justify-center animate-in fade-in duration-500">
       <div
         className="relative w-[1920px] h-[1080px] shrink-0"
-        style={{ transform: `scale(${scale})` }}
+        style={{ transform: `scale(${scale})`, transformOrigin: 'top' }}
       >
         <img src="/assets/background/준비화면.svg" className="absolute inset-0 w-full h-full object-cover -z-10" alt="" />
 

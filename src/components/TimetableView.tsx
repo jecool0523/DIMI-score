@@ -38,10 +38,10 @@ const TimetableView = () => {
   const seconds = time.getSeconds().toString().padStart(2, '0');
 
   return (
-    <div className="fixed inset-0 z-40 bg-background overflow-hidden flex items-center justify-center animate-in fade-in duration-500">
+    <div className="fixed inset-0 z-40 bg-background overflow-hidden flex items-start justify-center animate-in fade-in duration-500">
       <div
         className="relative w-[1920px] h-[1080px] shrink-0"
-        style={{ transform: `scale(${scale})` }}
+        style={{ transform: `scale(${scale})`, transformOrigin: 'top' }}
       >
         <img src="/assets/background/기본 화면(개막식).svg" className="absolute inset-0 w-full h-full object-cover -z-10" alt="" />
 

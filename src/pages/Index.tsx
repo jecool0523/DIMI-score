@@ -56,7 +56,7 @@ const DisplayPage = () => {
       </div>
 
       {/* Marquee Banner */}
-      <MarqueeBanner />
+      {viewMode !== 'TIMETABLE' && <MarqueeBanner />}
 
       {/* Big Announcement Overlay */}
       <AnnouncementOverlay show={showBigAnnouncement} announcement={announcement} />
