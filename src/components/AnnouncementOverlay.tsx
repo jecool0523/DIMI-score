@@ -25,6 +25,7 @@ export default function AnnouncementOverlay({ show, announcement }: Announcement
                 className="relative w-[1920px] h-[1080px] shrink-0"
                 style={{ transform: `scale(${scale})` }}
             >
+                <img src="/assets/background/공지화면.svg" className="absolute inset-0 w-full h-full object-cover -z-10" alt="" />
                 {/* Left Border Pattern */}
                 <div className="absolute bg-[#ff40c2] left-[0.74px] size-[30.652px] top-[337.17px]" />
                 <div className="absolute bg-[#ff40c2] left-[92.69px] size-[30.652px] top-[490.43px]" />

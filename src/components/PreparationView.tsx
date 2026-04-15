@@ -39,7 +39,7 @@ const PreparationView = () => {
         className="relative w-[1920px] h-[1080px] shrink-0"
         style={{ transform: `scale(${scale})` }}
       >
-        <img src="/assets/background/준비화면-배경.svg" className="absolute inset-0 w-full h-full object-cover -z-10" alt="" />
+        <img src="/assets/background/준비화면.svg" className="absolute inset-0 w-full h-full object-cover -z-10" alt="" />
 
         <TotalScoreBoard />
 
