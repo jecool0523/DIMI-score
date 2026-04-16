@@ -7,11 +7,28 @@ import MarqueeBanner from './MarqueeBanner';
 
 const PreparationView = () => {
   const events = useEventStore((s) => s.events);
-  const nextEvent = events.find((e) => e.status === 'UPCOMING') || events.find((e) => e.status === 'IN_PROGRESS');
   const isMobile = useIsMobile();
-
   const [scale, setScale] = useState(1);
   const [time, setTime] = useState(new Date());
+
+  const getNextEvent = () => {
+    const currentTotalMinutes = time.getHours() * 60 + time.getMinutes();
+    const getMinutes = (t: string) => {
+      const [h, m] = t.split(':').map(Number);
+      return h * 60 + m;
+    };
+
+    const inProgressIdx = events.findIndex(e => e.status === 'IN_PROGRESS');
+    if (inProgressIdx !== -1 && inProgressIdx < events.length - 1) {
+      return events[inProgressIdx + 1];
+    }
+
+    return events.find(e => e.status === 'UPCOMING' && getMinutes(e.time) >= currentTotalMinutes)
+      || events.find(e => e.status === 'UPCOMING')
+      || events.find(e => e.status === 'IN_PROGRESS');
+  };
+
+  const nextEvent = getNextEvent();
 
   useEffect(() => {
     const handleResize = () => {
