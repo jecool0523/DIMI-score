@@ -135,9 +135,9 @@ const mapEventRow = (event: EventRow): SportEvent => ({
   scoreA: event.score_a,
   scoreB: event.score_b,
   actualStartTime: event.actual_start_time ? Number(event.actual_start_time) : undefined,
-  duration: (event as any).duration ?? undefined,
-  setDuration: (event as any).set_duration ?? undefined,
-  setStartTime: (event as any).set_start_time ? Number((event as any).set_start_time) : undefined,
+  duration: event.duration ?? undefined,
+  setDuration: event.set_duration ?? undefined,
+  setStartTime: event.set_start_time ? Number(event.set_start_time) : undefined,
 });
 
 const applyAppState = (appState: AppStateRow) => {
@@ -557,23 +557,26 @@ export const useEventStore = create<EventStore>((set, get) => ({
     if (error) console.error('Error triggering announcement:', error);
   },
   updateEventDuration: async (id, duration) => {
-    // duration is stored locally only (not in DB schema)
     set((state) => ({
       events: state.events.map((e) => (e.id === id ? { ...e, duration } : e)),
     }));
+    const { error } = await supabase.from('events').update({ duration }).eq('id', id);
+    if (error) console.error('Error updating duration:', error);
   },
   updateEventSetDuration: async (id, set_duration) => {
-    // set_duration is stored locally only (not in DB schema)
     set((state) => ({
       events: state.events.map((e) => (e.id === id ? { ...e, setDuration: set_duration } : e)),
     }));
+    const { error } = await supabase.from('events').update({ set_duration }).eq('id', id);
+    if (error) console.error('Error updating set duration:', error);
   },
   resetSetTimer: async (id) => {
-    // set_start_time is stored locally only (not in DB schema)
     const timestamp = Date.now() + get().serverTimeOffset;
     set((state) => ({
       events: state.events.map((e) => (e.id === id ? { ...e, setStartTime: timestamp } : e)),
     }));
+    const { error } = await supabase.from('events').update({ set_start_time: timestamp }).eq('id', id);
+    if (error) console.error('Error resetting set timer:', error);
   },
   resetToDefaultSchedule: async () => {
     // 1. Delete all existing events

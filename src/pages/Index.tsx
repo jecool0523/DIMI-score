@@ -109,7 +109,7 @@ const DisplayPage = () => {
       )}
 
       {/* Main views */}
-      <div className="flex-1 flex flex-col items-center justify-center w-full">
+      <div className="flex-1 flex flex-col items-center justify-start w-full">
         {effectiveViewMode === 'TIMETABLE' && <TimetableView />}
         {effectiveViewMode === 'IN_PROGRESS' && <InProgressView />}
         {effectiveViewMode === 'PREPARATION' && <PreparationView />}
