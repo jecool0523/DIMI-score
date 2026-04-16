@@ -561,14 +561,26 @@ export const useEventStore = create<EventStore>((set, get) => ({
       events: state.events.map((e) => (e.id === id ? { ...e, duration } : e)),
     }));
     const { error } = await supabase.from('events').update({ duration }).eq('id', id);
-    if (error) console.error('Error updating duration:', error);
+    if (error) {
+      if (error.code === 'PGRST204') {
+        console.warn('⚠️ duration column missing in DB — timer is local-only. Run migration SQL.');
+      } else {
+        console.error('Error updating duration:', error);
+      }
+    }
   },
   updateEventSetDuration: async (id, set_duration) => {
     set((state) => ({
       events: state.events.map((e) => (e.id === id ? { ...e, setDuration: set_duration } : e)),
     }));
     const { error } = await supabase.from('events').update({ set_duration }).eq('id', id);
-    if (error) console.error('Error updating set duration:', error);
+    if (error) {
+      if (error.code === 'PGRST204') {
+        console.warn('⚠️ set_duration column missing in DB — timer is local-only. Run migration SQL.');
+      } else {
+        console.error('Error updating set duration:', error);
+      }
+    }
   },
   resetSetTimer: async (id) => {
     const timestamp = Date.now() + get().serverTimeOffset;
@@ -576,7 +588,13 @@ export const useEventStore = create<EventStore>((set, get) => ({
       events: state.events.map((e) => (e.id === id ? { ...e, setStartTime: timestamp } : e)),
     }));
     const { error } = await supabase.from('events').update({ set_start_time: timestamp }).eq('id', id);
-    if (error) console.error('Error resetting set timer:', error);
+    if (error) {
+      if (error.code === 'PGRST204') {
+        console.warn('⚠️ set_start_time column missing in DB — timer is local-only. Run migration SQL.');
+      } else {
+        console.error('Error resetting set timer:', error);
+      }
+    }
   },
   resetToDefaultSchedule: async () => {
     // 1. Delete all existing events
