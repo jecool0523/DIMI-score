@@ -359,9 +359,16 @@ const startRealtime = async () => {
         void loadAppState();
       }
     })
-    .on('postgres_changes', { event: '*', schema: 'public', table: 'events' }, () => {
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'events' }, (payload) => {
       console.log('🔔 Event change received');
-      void loadEvents();
+      if (payload.new) {
+        const updatedEvent = mapEventRow(payload.new as EventRow);
+        useEventStore.setState((state) => ({
+          events: state.events.map((e) => (e.id === updatedEvent.id ? updatedEvent : e)),
+        }));
+      } else {
+        void loadEvents();
+      }
     })
     .subscribe((status) => {
       if (storeRuntime.realtimeChannel !== channel) {
@@ -426,18 +433,32 @@ export const useEventStore = create<EventStore>((set, get) => ({
     const currentIndex = events.findIndex(e => e.id === id);
     const nextEvent = events[currentIndex + 1];
 
-    // Optimistic update
+    // Optimistic update: Ensure only one event is IN_PROGRESS
     set((state) => ({
-      events: state.events.map((e) =>
-        e.id === id ? { ...e, status, actualStartTime: actualStartTime ?? e.actualStartTime } : e
-      ),
+      events: state.events.map((e) => {
+        if (e.id === id) {
+          return { ...e, status, actualStartTime: actualStartTime ?? e.actualStartTime };
+        }
+        if (status === 'IN_PROGRESS' && e.status === 'IN_PROGRESS') {
+          return { ...e, status: 'COMPLETED' };
+        }
+        return e;
+      }),
     }));
 
     const { error } = await supabase.from('events').update({
       status,
       actual_start_time: actualStartTime
     }).eq('id', id);
-    if (error) console.error('Error setting event status:', error);
+    if (error) {
+      console.error('Error setting event status:', error);
+    } else if (status === 'IN_PROGRESS') {
+      // Also update others to COMPLETED in DB to maintain exclusivity
+      await supabase.from('events')
+        .update({ status: 'COMPLETED' })
+        .neq('id', id)
+        .eq('status', 'IN_PROGRESS');
+    }
   },
 
   updateScore: async (id, team, delta) => {
@@ -571,7 +592,7 @@ const initStore = async () => {
 
   try {
     bindBrowserSyncListeners();
-    startPolling();
+    // startPolling();
     await syncFromDatabase('initial');
     await startRealtime();
     void useEventStore.getState().syncTimeOffset();
