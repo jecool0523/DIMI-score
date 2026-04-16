@@ -101,6 +101,36 @@ const TimetableView = () => {
         <p className="absolute left-1/2 -translate-x-1/2 top-[580px] font-sans text-[395px] text-black leading-none tracking-[0.05em] m-0 whitespace-nowrap tabular-nums z-10 pointer-events-none shadow-none text-center">
           {hours}:{minutes}:{seconds}
         </p>
+
+        <div className="absolute top-[120px] left-[170px] w-[100px] h-[493px] flex flex-col items-center justify-center gap-[40px] z-20">
+          {[0, 0.4, 0.8].map((delay, i) => (
+            <motion.div
+              key={i}
+              className="w-[100px] h-[100px]"
+              style={{ rotate: 90 }}
+              initial={{ opacity: 0, x: -30 }}
+              animate={{
+                opacity: [0, 1, 1, 0],
+                x: [-30, 0, 0, 30],
+              }}
+              transition={{
+                duration: 3,
+                times: [0, 0.1, 0.8, 1],
+                ease: ["easeOut", "linear", "easeIn"],
+                repeat: Infinity,
+                repeatDelay: 3,
+                delay: delay
+              }}
+            >
+              <img
+                src="/assets/match-arrow.svg"
+                className="w-full h-full"
+                style={{ filter: 'brightness(0) invert(1)' }}
+                alt=""
+              />
+            </motion.div>
+          ))}
+        </div>
       </div>
     </div>
   );
