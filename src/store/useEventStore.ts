@@ -350,13 +350,17 @@ const startRealtime = async () => {
   storeRuntime.realtimeStatus = 'CONNECTING';
 
   channel
-    .on('postgres_changes', { event: '*', schema: 'public', table: 'app_state' }, () => {
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'app_state' }, (payload) => {
       console.log('🔔 App state change received');
-      void syncFromDatabase('realtime:app_state');
+      if (payload.new) {
+        applyAppState(payload.new as AppStateRow);
+      } else {
+        void loadAppState();
+      }
     })
     .on('postgres_changes', { event: '*', schema: 'public', table: 'events' }, () => {
       console.log('🔔 Event change received');
-      void syncFromDatabase('realtime:events');
+      void loadEvents();
     })
     .subscribe((status) => {
       if (storeRuntime.realtimeChannel !== channel) {
