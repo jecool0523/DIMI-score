@@ -9,20 +9,11 @@ const PreparationView = () => {
   const [time, setTime] = useState(new Date());
 
   const getNextEvent = () => {
-    const currentTotalMinutes = time.getHours() * 60 + time.getMinutes();
-    const getMinutes = (t: string) => {
-      const [h, m] = t.split(':').map(Number);
-      return h * 60 + m;
-    };
-
-    const inProgressIdx = events.findIndex(e => e.status === 'IN_PROGRESS');
-    if (inProgressIdx !== -1 && inProgressIdx < events.length - 1) {
-      return events[inProgressIdx + 1];
-    }
-
-    return events.find(e => e.status === 'UPCOMING' && getMinutes(e.time) >= currentTotalMinutes)
-      || events.find(e => e.status === 'UPCOMING')
-      || events.find(e => e.status === 'IN_PROGRESS');
+    // Reactive logic: find the event immediately following the last COMPLETED event
+    const lastCompletedIndex = [...events].reverse().findIndex(e => e.status === 'COMPLETED');
+    const actualLastCompletedIdx = lastCompletedIndex === -1 ? -1 : events.length - 1 - lastCompletedIndex;
+    const nextIndex = actualLastCompletedIdx + 1;
+    return events[nextIndex] || events[0];
   };
 
   const nextEvent = getNextEvent();
@@ -83,7 +74,7 @@ const PreparationView = () => {
         </div>
 
         <div className="absolute top-[120px] left-[917px] w-[1003px] h-[535px]">
-          <div className="absolute font-sans leading-[0.9] text-[#ff40c2] m-0 flex flex-col text-right tabular-nums gap-0 z-10 font-black text-[170px] right-[60px] top-[80px]">
+          <div className="absolute font-sans leading-[0.9] text-[#ff40c2] m-0 flex flex-col text-right tabular-nums gap-0 z-10 font-black text-[170px] right-[150px] top-[30px]">
             <span>{hours}</span>
             <span>{minutes}</span>
             <span>{seconds}</span>

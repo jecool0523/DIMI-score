@@ -433,22 +433,6 @@ export const useEventStore = create<EventStore>((set, get) => ({
       ),
     }));
 
-    // Automatic view mode switching
-    if (status === 'IN_PROGRESS') {
-      const event = events.find(e => e.id === id);
-      if (event?.name === '개회식' || event?.name === '폐회식') {
-        get().setViewMode('TIMETABLE');
-      } else {
-        get().setViewMode('IN_PROGRESS');
-      }
-    } else if (status === 'COMPLETED') {
-      if (nextEvent) {
-        get().setViewMode('PREPARATION');
-      } else {
-        get().setViewMode('TIMETABLE');
-      }
-    }
-
     const { error } = await supabase.from('events').update({
       status,
       actual_start_time: actualStartTime

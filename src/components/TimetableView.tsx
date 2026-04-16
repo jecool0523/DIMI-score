@@ -37,7 +37,6 @@ const TimetableView = () => {
       }
     });
     setEventStatus(event.id, 'IN_PROGRESS');
-    setViewMode('IN_PROGRESS');
   };
 
   const hours = time.getHours().toString().padStart(2, '0');
