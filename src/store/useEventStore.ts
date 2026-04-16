@@ -18,6 +18,8 @@ export interface SportEvent {
   scoreB: number;
   actualStartTime?: number;
   duration?: number;
+  setDuration?: number;
+  setStartTime?: number;
 }
 
 interface EventStore {
@@ -36,6 +38,8 @@ interface EventStore {
   resetBonusScore: () => void;
   triggerAnnouncement: () => void;
   updateEventDuration: (id: string, duration: number) => void;
+  updateEventSetDuration: (id: string, duration: number) => void;
+  resetSetTimer: (id: string) => void;
   resetToDefaultSchedule: () => Promise<void>;
 }
 
@@ -127,6 +131,8 @@ const mapEventRow = (event: EventRow): SportEvent => ({
   scoreB: event.score_b,
   actualStartTime: event.actual_start_time ? Number(event.actual_start_time) : undefined,
   duration: (event as any).duration ?? undefined,
+  setDuration: (event as any).set_duration ?? undefined,
+  setStartTime: (event as any).set_start_time ? Number((event as any).set_start_time) : undefined,
 });
 
 const applyAppState = (appState: AppStateRow) => {
@@ -482,6 +488,21 @@ export const useEventStore = create<EventStore>((set, get) => ({
     }));
     const { error } = await supabase.from('events').update({ duration } as any).eq('id', id);
     if (error) console.error('Error updating duration:', error);
+  },
+  updateEventSetDuration: async (id, set_duration) => {
+    set((state) => ({
+      events: state.events.map((e) => (e.id === id ? { ...e, setDuration: set_duration } : e)),
+    }));
+    const { error } = await supabase.from('events').update({ set_duration } as any).eq('id', id);
+    if (error) console.error('Error updating set duration:', error);
+  },
+  resetSetTimer: async (id) => {
+    const timestamp = Date.now();
+    set((state) => ({
+      events: state.events.map((e) => (e.id === id ? { ...e, setStartTime: timestamp } : e)),
+    }));
+    const { error } = await supabase.from('events').update({ set_start_time: timestamp } as any).eq('id', id);
+    if (error) console.error('Error resetting set timer:', error);
   },
   resetToDefaultSchedule: async () => {
     // 1. Delete all existing events

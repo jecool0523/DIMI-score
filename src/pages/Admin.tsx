@@ -32,19 +32,23 @@ const AdminPage = () => {
     }
   };
 
-  const { viewMode, setViewMode, events, setEventStatus, updateScore, resetScore, setAnnouncement, bonusScoreA, bonusScoreB, updateBonusScore, resetBonusScore, triggerAnnouncement, updateEventDuration, resetToDefaultSchedule } = useEventStore();
+  const { viewMode, setViewMode, events, setEventStatus, updateScore, resetScore, setAnnouncement, bonusScoreA, bonusScoreB, updateBonusScore, resetBonusScore, triggerAnnouncement, updateEventDuration, updateEventSetDuration, resetSetTimer, resetToDefaultSchedule } = useEventStore();
   const [announcementInput, setAnnouncementInput] = useState('');
   const [manualBonusA, setManualBonusA] = useState('');
   const [manualBonusB, setManualBonusB] = useState('');
   const [eventManualInputs, setEventManualInputs] = useState<Record<string, { A: string; B: string }>>({});
-  const [durationInputs, setDurationInputs] = useState<Record<string, string>>({});
+  const [overallDurationInputs, setOverallDurationInputs] = useState<Record<string, string>>({});
+  const [setDurationInputs, setSetSetDurationInputs] = useState<Record<string, string>>({});
 
   useEffect(() => {
-    const inputs: Record<string, string> = {};
+    const dInputs: Record<string, string> = {};
+    const sInputs: Record<string, string> = {};
     events.forEach(e => {
-      inputs[e.id] = e.duration?.toString() || '40';
+      dInputs[e.id] = e.duration?.toString() || '40';
+      sInputs[e.id] = e.setDuration?.toString() || '15';
     });
-    setDurationInputs(inputs);
+    setOverallDurationInputs(dInputs);
+    setSetSetDurationInputs(sInputs);
   }, [events]);
 
   const handleEventManualInputChange = (eventId: string, team: 'A' | 'B', value: string) => {
@@ -287,20 +291,48 @@ const AdminPage = () => {
                     }`}>
                     {event.status === 'COMPLETED' ? '완료' : event.status === 'IN_PROGRESS' ? '진행중' : '예정'}
                   </span>
-                  <div className="flex items-center gap-2 bg-secondary/30 px-2 py-1 rounded border border-border/50">
-                    <span className="text-[10px] uppercase font-bold text-muted-foreground">경과 시간 (분)</span>
-                    <Input
-                      type="number"
-                      value={durationInputs[event.id] || ''}
-                      onChange={(e) => setDurationInputs(prev => ({ ...prev, [event.id]: e.target.value }))}
-                      onBlur={() => {
-                        const val = parseInt(durationInputs[event.id]);
-                        if (!isNaN(val) && val > 0) {
-                          updateEventDuration(event.id, val);
-                        }
-                      }}
-                      className="h-6 w-14 text-xs px-1 text-center"
-                    />
+                  <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-2 bg-secondary/30 px-2 py-1 rounded border border-border/50">
+                      <span className="text-[10px] uppercase font-bold text-muted-foreground">경기 시간(분)</span>
+                      <Input
+                        type="number"
+                        value={overallDurationInputs[event.id] || ''}
+                        onChange={(e) => setOverallDurationInputs(prev => ({ ...prev, [event.id]: e.target.value }))}
+                        onBlur={() => {
+                          const val = parseInt(overallDurationInputs[event.id]);
+                          if (!isNaN(val) && val > 0) {
+                            updateEventDuration(event.id, val);
+                          }
+                        }}
+                        className="h-6 w-14 text-xs px-1 text-center"
+                      />
+                    </div>
+                    <div className="flex items-center gap-2 bg-pink-50/50 px-2 py-1 rounded border border-pink-100">
+                      <span className="text-[10px] uppercase font-bold text-pink-600">세트 시간(분)</span>
+                      <Input
+                        type="number"
+                        value={setDurationInputs[event.id] || ''}
+                        onChange={(e) => setSetSetDurationInputs(prev => ({ ...prev, [event.id]: e.target.value }))}
+                        onBlur={() => {
+                          const val = parseInt(setDurationInputs[event.id]);
+                          if (!isNaN(val) && val > 0) {
+                            updateEventSetDuration(event.id, val);
+                          }
+                        }}
+                        className="h-6 w-14 text-xs px-1 text-center border-pink-200"
+                      />
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => {
+                          resetSetTimer(event.id);
+                          toast.success(`${event.name} 세트 타이머가 시작되었습니다.`);
+                        }}
+                        className="h-6 w-6 p-0 text-pink-500 hover:text-pink-600 hover:bg-pink-100"
+                      >
+                        <RotateCcw size={12} />
+                      </Button>
+                    </div>
                   </div>
                 </div>
                 <div className="flex gap-2">

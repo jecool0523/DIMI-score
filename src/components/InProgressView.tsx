@@ -73,6 +73,15 @@ const InProgressView = () => {
   // Countdown Calculation
   const getRemainingTimeMs = () => {
     if (!current) return 0;
+
+    // Use setDuration and setStartTime if available
+    if (current.setDuration && current.setStartTime) {
+      const durationMs = current.setDuration * 60 * 1000;
+      const elapsedMs = time.getTime() - current.setStartTime;
+      return Math.max(0, durationMs - elapsedMs);
+    }
+
+    // Fallback: Use duration and actualStartTime (overall match timer)
     const currentIndex = events.findIndex(e => e.id === current.id);
     const nextEvent = events[currentIndex + 1];
     let durationInMinutes = 40;
@@ -93,14 +102,15 @@ const InProgressView = () => {
 
     if (current.actualStartTime) {
       elapsedMs = time.getTime() - current.actualStartTime;
-    } else {
-      const now = time;
+    } else if (current.time) {
+      // Fallback to scheduled time if no actual start time
       const [h, m] = current.time.split(':').map(Number);
-      const scheduledDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), h, m, 0);
-      elapsedMs = now.getTime() - scheduledDate.getTime();
+      const scheduledStart = new Date(time);
+      scheduledStart.setHours(h, m, 0, 0);
+      elapsedMs = time.getTime() - scheduledStart.getTime();
     }
 
-    return Math.max(durationMs - elapsedMs, 0);
+    return Math.max(0, durationMs - elapsedMs);
   };
 
   const remainingMs = getRemainingTimeMs();
