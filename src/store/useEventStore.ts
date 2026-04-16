@@ -42,6 +42,7 @@ interface EventStore {
   updateEventSetDuration: (id: string, duration: number) => void;
   resetSetTimer: (id: string) => void;
   resetToDefaultSchedule: () => Promise<void>;
+  syncTimeOffset: () => Promise<void>;
 }
 
 type AppStateRow = Tables<'app_state'>;
@@ -434,7 +435,12 @@ export const useEventStore = create<EventStore>((set, get) => ({
 
     // Automatic view mode switching
     if (status === 'IN_PROGRESS') {
-      get().setViewMode('IN_PROGRESS');
+      const event = events.find(e => e.id === id);
+      if (event?.name === '개회식' || event?.name === '폐회식') {
+        get().setViewMode('TIMETABLE');
+      } else {
+        get().setViewMode('IN_PROGRESS');
+      }
     } else if (status === 'COMPLETED') {
       if (nextEvent) {
         get().setViewMode('PREPARATION');

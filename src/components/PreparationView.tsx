@@ -62,28 +62,28 @@ const PreparationView = () => {
   const arrowTransitions = [0, 0.4, 0.8];
 
   return (
-    <div className="fixed inset-0 z-40 bg-[#F4F4F4] overflow-hidden flex items-center justify-center animate-in fade-in duration-500">
+    <div className="fixed inset-0 z-40 bg-[#F4F4F4] overflow-hidden flex items-start justify-center animate-in fade-in duration-500">
       <div
         className="relative shrink-0"
         style={{
           width: '1920px',
           height: '1080px',
           transform: `scale(${scale})`,
-          transformOrigin: 'center'
+          transformOrigin: 'top'
         }}
       >
         <img src="/assets/background/준비화면.svg" className="absolute inset-0 w-full h-full object-cover -z-10" alt="" />
 
         <TotalScoreBoard />
 
-        <div className="absolute top-[120px] left-0 w-[916px] h-[861px] flex items-center justify-center">
-          <p className="font-sans font-extrabold leading-tight text-black text-center whitespace-normal m-0 tracking-tight break-keep text-[205.4px] px-[71.3px]">
+        <div className="absolute top-[120px] left-0 w-[916px] h-[861px]">
+          <p className="absolute font-sans font-extrabold leading-tight text-black whitespace-normal m-0 tracking-tight break-keep text-[205.4px] left-[71.3px] top-[180px] w-[800px]">
             {nextEvent.name}
           </p>
         </div>
 
-        <div className="absolute top-[120px] left-[917px] w-[1003px] h-[535px] flex items-center justify-center">
-          <div className="font-sans leading-[0.9] text-[#ff40c2] m-0 flex flex-col text-right pr-[120px] tabular-nums gap-0 z-10 font-black text-[170px]">
+        <div className="absolute top-[120px] left-[917px] w-[1003px] h-[535px]">
+          <div className="absolute font-sans leading-[0.9] text-[#ff40c2] m-0 flex flex-col text-right tabular-nums gap-0 z-10 font-black text-[170px] right-[60px] top-[80px]">
             <span>{hours}</span>
             <span>{minutes}</span>
             <span>{seconds}</span>
