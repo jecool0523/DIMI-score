@@ -14,7 +14,72 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      app_state: {
+        Row: {
+          announcement: string
+          announcement_timestamp: number
+          bonus_score_a: number
+          bonus_score_b: number
+          id: number
+          view_mode: string
+        }
+        Insert: {
+          announcement?: string
+          announcement_timestamp?: number
+          bonus_score_a?: number
+          bonus_score_b?: number
+          id: number
+          view_mode?: string
+        }
+        Update: {
+          announcement?: string
+          announcement_timestamp?: number
+          bonus_score_a?: number
+          bonus_score_b?: number
+          id?: number
+          view_mode?: string
+        }
+        Relationships: []
+      }
+      events: {
+        Row: {
+          actual_start_time: number | null
+          icon: string
+          id: string
+          name: string
+          score_a: number
+          score_b: number
+          status: string
+          team_a: string | null
+          team_b: string | null
+          time: string
+        }
+        Insert: {
+          actual_start_time?: number | null
+          icon?: string
+          id: string
+          name: string
+          score_a?: number
+          score_b?: number
+          status?: string
+          team_a?: string | null
+          team_b?: string | null
+          time: string
+        }
+        Update: {
+          actual_start_time?: number | null
+          icon?: string
+          id?: string
+          name?: string
+          score_a?: number
+          score_b?: number
+          status?: string
+          team_a?: string | null
+          team_b?: string | null
+          time?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
