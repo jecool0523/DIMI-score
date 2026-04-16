@@ -39,14 +39,14 @@ const TimetableView = () => {
   const seconds = time.getSeconds().toString().padStart(2, '0');
 
   return (
-    <div className="fixed inset-0 z-40 bg-[#F4F4F4] overflow-hidden flex items-center justify-center animate-in fade-in duration-500">
+    <div className="w-full bg-[#F4F4F4] overflow-hidden flex items-start justify-center animate-in fade-in duration-500">
       <div
         className="relative shrink-0"
         style={{
           width: '1920px',
           height: '1080px',
           transform: `scale(${scale})`,
-          transformOrigin: 'center'
+          transformOrigin: 'top'
         }}
       >
         <img

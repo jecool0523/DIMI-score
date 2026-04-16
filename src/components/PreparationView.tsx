@@ -53,7 +53,7 @@ const PreparationView = () => {
   const arrowTransitions = [0, 0.4, 0.8];
 
   return (
-    <div className="fixed inset-0 z-40 bg-[#F4F4F4] overflow-hidden flex items-start justify-center animate-in fade-in duration-500">
+    <div className="w-full bg-[#F4F4F4] overflow-hidden flex items-start justify-center animate-in fade-in duration-500">
       <div
         className="relative shrink-0"
         style={{

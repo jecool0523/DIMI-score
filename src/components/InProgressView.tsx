@@ -131,14 +131,14 @@ const InProgressView = () => {
   const progressWidth = baseWidth * progress;
 
   return (
-    <div className="fixed inset-0 z-40 bg-[#F4F4F4] flex items-center justify-center animate-in fade-in duration-500 overflow-hidden">
+    <div className="w-full bg-[#F4F4F4] flex items-start justify-center animate-in fade-in duration-500 overflow-hidden">
       <div
         className="relative shrink-0"
         style={{
           width: '1920px',
           height: '1080px',
           transform: `scale(${scale})`,
-          transformOrigin: 'center'
+          transformOrigin: 'top'
         }}
       >
         <img
