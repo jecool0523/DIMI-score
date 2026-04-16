@@ -32,11 +32,20 @@ const AdminPage = () => {
     }
   };
 
-  const { viewMode, setViewMode, events, setEventStatus, updateScore, resetScore, setAnnouncement, bonusScoreA, bonusScoreB, updateBonusScore, resetBonusScore, triggerAnnouncement } = useEventStore();
+  const { viewMode, setViewMode, events, setEventStatus, updateScore, resetScore, setAnnouncement, bonusScoreA, bonusScoreB, updateBonusScore, resetBonusScore, triggerAnnouncement, updateEventDuration } = useEventStore();
   const [announcementInput, setAnnouncementInput] = useState('');
   const [manualBonusA, setManualBonusA] = useState('');
   const [manualBonusB, setManualBonusB] = useState('');
   const [eventManualInputs, setEventManualInputs] = useState<Record<string, { A: string; B: string }>>({});
+  const [durationInputs, setDurationInputs] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    const inputs: Record<string, string> = {};
+    events.forEach(e => {
+      inputs[e.id] = e.duration?.toString() || '40';
+    });
+    setDurationInputs(inputs);
+  }, [events]);
 
   const handleEventManualInputChange = (eventId: string, team: 'A' | 'B', value: string) => {
     setEventManualInputs(prev => ({
@@ -95,6 +104,7 @@ const AdminPage = () => {
             </div>
             <h1 className="font-['Pretendard'] text-2xl font-semibold text-foreground text-center">관리자 로그인</h1>
             <p className="text-sm text-muted-foreground text-center mt-2">페이지에 접근하려면 비밀번호를 입력해주세요.</p>
+            <p className="text-sm text-muted-foreground text-center mt-2">학생회 혹은 관련자가 아닌 분들은 접근하지 말아주세요.</p>
           </div>
           <form onSubmit={handleLogin} className="space-y-4">
             <Input
@@ -263,6 +273,21 @@ const AdminPage = () => {
                     }`}>
                     {event.status === 'COMPLETED' ? '완료' : event.status === 'IN_PROGRESS' ? '진행중' : '예정'}
                   </span>
+                  <div className="flex items-center gap-2 bg-secondary/30 px-2 py-1 rounded border border-border/50">
+                    <span className="text-[10px] uppercase font-bold text-muted-foreground">경과 시간 (분)</span>
+                    <Input
+                      type="number"
+                      value={durationInputs[event.id] || ''}
+                      onChange={(e) => setDurationInputs(prev => ({ ...prev, [event.id]: e.target.value }))}
+                      onBlur={() => {
+                        const val = parseInt(durationInputs[event.id]);
+                        if (!isNaN(val) && val > 0) {
+                          updateEventDuration(event.id, val);
+                        }
+                      }}
+                      className="h-6 w-14 text-xs px-1 text-center"
+                    />
+                  </div>
                 </div>
                 <div className="flex gap-2">
                   <Button

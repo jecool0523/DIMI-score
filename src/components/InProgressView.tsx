@@ -83,7 +83,9 @@ const InProgressView = () => {
     const nextEvent = events[currentIndex + 1];
     let durationInMinutes = 40;
 
-    if (nextEvent) {
+    if (current.duration) {
+      durationInMinutes = current.duration;
+    } else if (nextEvent) {
       const getMinutes = (t: string) => {
         const [h, m] = t.split(':').map(Number);
         return h * 60 + m;
@@ -121,7 +123,9 @@ const InProgressView = () => {
     const currentIndex = events.findIndex(e => e.id === current.id);
     const nextEvent = events[currentIndex + 1];
     let durationInMinutes = 40;
-    if (nextEvent) {
+    if (current.duration) {
+      durationInMinutes = current.duration;
+    } else if (nextEvent) {
       const getMinutes = (t: string) => {
         const [h, m] = t.split(':').map(Number);
         return h * 60 + m;

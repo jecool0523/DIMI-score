@@ -17,6 +17,7 @@ export interface SportEvent {
   scoreA: number;
   scoreB: number;
   actualStartTime?: number;
+  duration?: number;
 }
 
 interface EventStore {
@@ -34,6 +35,7 @@ interface EventStore {
   updateBonusScore: (team: 'A' | 'B', delta: number) => void;
   resetBonusScore: () => void;
   triggerAnnouncement: () => void;
+  updateEventDuration: (id: string, duration: number) => void;
 }
 
 type AppStateRow = Tables<'app_state'>;
@@ -117,6 +119,7 @@ const mapEventRow = (event: EventRow): SportEvent => ({
   scoreA: event.score_a,
   scoreB: event.score_b,
   actualStartTime: event.actual_start_time ? Number(event.actual_start_time) : undefined,
+  duration: (event as any).duration ?? undefined,
 });
 
 const applyAppState = (appState: AppStateRow) => {
@@ -465,6 +468,13 @@ export const useEventStore = create<EventStore>((set, get) => ({
     set({ announcementTimestamp: timestamp });
     const { error } = await supabase.from('app_state').update({ announcement_timestamp: timestamp }).eq('id', APP_STATE_ID);
     if (error) console.error('Error triggering announcement:', error);
+  },
+  updateEventDuration: async (id, duration) => {
+    set((state) => ({
+      events: state.events.map((e) => (e.id === id ? { ...e, duration } : e)),
+    }));
+    const { error } = await supabase.from('events').update({ duration } as any).eq('id', id);
+    if (error) console.error('Error updating duration:', error);
   },
 }));
 
