@@ -29,6 +29,7 @@ interface EventStore {
   events: SportEvent[];
   bonusScoreA: number;
   bonusScoreB: number;
+  serverTimeOffset: number;
   setViewMode: (mode: ViewMode) => void;
   setAnnouncement: (text: string) => void;
   setEventStatus: (id: string, status: EventStatus) => void;
@@ -85,15 +86,17 @@ const defaultEvents: SportEvent[] = [
   { id: '2', name: '사제 족구', time: '09:30', duration: 30, icon: 'Circle', status: 'UPCOMING', teamA: '청팀', teamB: '백팀', scoreA: 0, scoreB: 0 },
   { id: '3', name: '여자 피구', time: '10:05', duration: 30, icon: 'Users', status: 'UPCOMING', teamA: '청팀', teamB: '백팀', scoreA: 0, scoreB: 0 },
   { id: '4', name: '줄다리기', time: '10:35', duration: 25, icon: 'Grip', status: 'UPCOMING', teamA: '청팀', teamB: '백팀', scoreA: 0, scoreB: 0 },
-  { id: '5', name: 'US 공연', time: '11:05', duration: 15, icon: 'Music', status: 'UPCOMING', scoreA: 0, scoreB: 0 },
+  { id: '5', name: '어스', time: '11:05', duration: 15, icon: 'Music', status: 'UPCOMING', scoreA: 0, scoreB: 0 },
   { id: '6', name: '농구', time: '11:30', duration: 50, icon: 'CircleDot', status: 'UPCOMING', teamA: '청팀', teamB: '백팀', scoreA: 0, scoreB: 0 },
   { id: '7', name: 'O/X 퀴즈', time: '12:25', duration: 15, icon: 'HelpCircle', status: 'UPCOMING', scoreA: 0, scoreB: 0 },
   { id: '8', name: '점심 식사', time: '12:50', duration: 60, icon: 'UtensilsCrossed', status: 'UPCOMING', scoreA: 0, scoreB: 0 },
   { id: '9', name: '종목 릴레이', time: '14:00', duration: 30, icon: 'Activity', status: 'UPCOMING', teamA: '청팀', teamB: '백팀', scoreA: 0, scoreB: 0 },
-  { id: '10', name: '사제 축구', time: '14:35', duration: 25, icon: 'Target', status: 'UPCOMING', teamA: '청팀', teamB: '백팀', scoreA: 0, scoreB: 0 },
-  { id: '11', name: '노래 자랑', time: '15:35', duration: 5, icon: 'Mic2', status: 'UPCOMING', scoreA: 0, scoreB: 0 },
-  { id: '12', name: '계주', time: '15:50', duration: 25, icon: 'Zap', status: 'UPCOMING', teamA: '청팀', teamB: '백팀', scoreA: 0, scoreB: 0 },
-  { id: '13', name: '폐회식', time: '16:15', duration: 10, icon: 'Trophy', status: 'UPCOMING', scoreA: 0, scoreB: 0 },
+  { id: '10', name: '사제 축구 전반', time: '14:35', duration: 25, icon: 'Target', status: 'UPCOMING', teamA: '청팀', teamB: '백팀', scoreA: 0, scoreB: 0 },
+  { id: '11', name: '노래 자랑', time: '15:00', duration: 5, icon: 'Mic2', status: 'UPCOMING', scoreA: 0, scoreB: 0 },
+  { id: '12', name: '사제 축구 후반', time: '15:05', duration: 25, icon: 'Target', status: 'UPCOMING', teamA: '청팀', teamB: '백팀', scoreA: 0, scoreB: 0 },
+  { id: '13', name: '노래 자랑', time: '15:35', duration: 5, icon: 'Mic2', status: 'UPCOMING', scoreA: 0, scoreB: 0 },
+  { id: '14', name: '계주', time: '15:50', duration: 25, icon: 'Zap', status: 'UPCOMING', teamA: '청팀', teamB: '백팀', scoreA: 0, scoreB: 0 },
+  { id: '15', name: '폐회식', time: '16:15', duration: 10, icon: 'Trophy', status: 'UPCOMING', scoreA: 0, scoreB: 0 },
 ];
 
 const defaultAppState: AppStateRow = {
@@ -392,9 +395,10 @@ export const useEventStore = create<EventStore>((set, get) => ({
   viewMode: 'TIMETABLE',
   announcement: DEFAULT_ANNOUNCEMENT,
   announcementTimestamp: 0,
-  events: defaultEvents, // Initial state should be defaults to show something while loading
+  events: defaultEvents,
   bonusScoreA: 0,
   bonusScoreB: 0,
+  serverTimeOffset: 0,
 
   setViewMode: async (mode) => {
     set({ viewMode: mode });
@@ -497,7 +501,7 @@ export const useEventStore = create<EventStore>((set, get) => ({
     if (error) console.error('Error updating set duration:', error);
   },
   resetSetTimer: async (id) => {
-    const timestamp = Date.now();
+    const timestamp = Date.now() + get().serverTimeOffset;
     set((state) => ({
       events: state.events.map((e) => (e.id === id ? { ...e, setStartTime: timestamp } : e)),
     }));
@@ -524,6 +528,29 @@ export const useEventStore = create<EventStore>((set, get) => ({
       applyEvents(data);
     }
   },
+
+  syncTimeOffset: async () => {
+    try {
+      const start = Date.now();
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+      const response = await fetch(`${supabaseUrl}/rest/v1/?t=${start}`, {
+        method: 'HEAD',
+        cache: 'no-store'
+      });
+      const end = Date.now();
+
+      const serverDateStr = response.headers.get('date');
+      if (serverDateStr) {
+        const serverTime = new Date(serverDateStr).getTime();
+        const localTimeAtServerCall = (start + end) / 2;
+        const offset = serverTime - localTimeAtServerCall;
+        set({ serverTimeOffset: offset });
+        console.log('⏰ Time synced with server. Offset:', offset, 'ms');
+      }
+    } catch (e) {
+      console.warn('Time sync fallback to local:', e);
+    }
+  },
 }));
 
 const initStore = async () => {
@@ -539,6 +566,7 @@ const initStore = async () => {
     startPolling();
     await syncFromDatabase('initial');
     await startRealtime();
+    void useEventStore.getState().syncTimeOffset();
   } catch (err) {
     console.error('💥 Critical error in initStore:', err);
   }

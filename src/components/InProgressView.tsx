@@ -11,6 +11,7 @@ const InProgressView = () => {
 
   const [scale, setScale] = useState(1);
   const [time, setTime] = useState(new Date());
+  const serverTimeOffset = useEventStore((s) => s.serverTimeOffset);
 
   const prevScoreARef = useRef(current?.scoreA);
   const prevScoreBRef = useRef(current?.scoreB);
@@ -81,7 +82,8 @@ const InProgressView = () => {
 
     if (!startTimestamp) return 0;
 
-    const elapsedMs = time.getTime() - startTimestamp;
+    const currentTime = Date.now() + serverTimeOffset;
+    const elapsedMs = currentTime - startTimestamp;
     return Math.max(0, durationMs - elapsedMs);
   };
 
@@ -110,14 +112,16 @@ const InProgressView = () => {
       if (durationInMinutes <= 0) durationInMinutes = 40;
     }
     const durationMs = durationInMinutes * 60 * 1000;
+    const currentTime = Date.now() + serverTimeOffset;
     let elapsedMs = 0;
+
     if (current.actualStartTime) {
-      elapsedMs = time.getTime() - current.actualStartTime;
+      elapsedMs = currentTime - current.actualStartTime;
     } else {
-      const now = time;
       const [h, m] = current.time.split(':').map(Number);
-      const scheduledDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), h, m, 0);
-      elapsedMs = now.getTime() - scheduledDate.getTime();
+      const scheduledDate = new Date();
+      scheduledDate.setHours(h, m, 0, 0);
+      elapsedMs = currentTime - scheduledDate.getTime();
     }
     return Math.min(Math.max(elapsedMs / durationMs, 0), 1);
   };

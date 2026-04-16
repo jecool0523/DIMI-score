@@ -421,6 +421,10 @@ const AdminPage = () => {
                           size="sm"
                           variant="ghost"
                           onClick={() => {
+                            const val = parseInt(setDurationInputs[event.id]);
+                            if (!isNaN(val) && val > 0 && val !== event.setDuration) {
+                              updateEventSetDuration(event.id, val);
+                            }
                             resetSetTimer(event.id);
                             toast.success(`${event.name} 세트 타이머가 시작되었습니다.`);
                           }}
