@@ -19,13 +19,16 @@ const DisplayPage = () => {
   const currentEvent = currentIdx >= 0 ? events[currentIdx] : null;
   const nextEvent = currentIdx >= 0 && currentIdx + 1 < events.length ? events[currentIdx + 1] : null;
 
+  const [loadTime] = useState(Date.now());
+
   useEffect(() => {
-    if (announcementTimestamp > 0) {
+    // Only show if the announcement was triggered AFTER the page loaded
+    if (announcementTimestamp > loadTime) {
       setShowBigAnnouncement(true);
       const timer = setTimeout(() => setShowBigAnnouncement(false), 5000);
       return () => clearTimeout(timer);
     }
-  }, [announcementTimestamp]);
+  }, [announcementTimestamp, loadTime]);
 
   const handleClick = useCallback(() => {
     const el = document.documentElement;
