@@ -7,7 +7,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 const InProgressView = () => {
   const events = useEventStore((s) => s.events);
-  const current = events.find((e) => e.status === 'IN_PROGRESS');
+  const inProgressEvents = events.filter((e) => e.status === 'IN_PROGRESS');
+  const current = inProgressEvents.find((e) => e.teamA && e.teamA.trim() !== '') ?? inProgressEvents[0];
 
   const [scale, setScale] = useState(1);
   const [time, setTime] = useState(new Date());

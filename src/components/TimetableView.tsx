@@ -3,7 +3,7 @@ import { useEventStore, type SportEvent } from '@/store/useEventStore';
 import TotalScoreBoard from './TotalScoreBoard';
 import { motion } from 'framer-motion';
 
-const TimetableView = () => {
+const TimetableView = ({ isLunchTime = false }: { isLunchTime?: boolean }) => {
   const events = useEventStore((s) => s.events);
   const setEventStatus = useEventStore((s) => s.setEventStatus);
   const setViewMode = useEventStore((s) => s.setViewMode);
@@ -50,7 +50,11 @@ const TimetableView = () => {
         }}
       >
         <img
-          src="/assets/background/기본 화면(개막식).svg"
+          src={
+            isLunchTime
+              ? '/assets/background/점심 화면.svg'
+              : '/assets/background/기본 화면(개막식).svg'
+          }
           className="absolute inset-0 w-full h-full object-cover -z-10"
           alt=""
         />

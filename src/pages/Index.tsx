@@ -110,7 +110,7 @@ const DisplayPage = () => {
 
       {/* Main views */}
       <div className="flex-1 flex flex-col items-center justify-start w-full">
-        {effectiveViewMode === 'TIMETABLE' && <TimetableView />}
+        {effectiveViewMode === 'TIMETABLE' && <TimetableView isLunchTime={events.some(e => e.name === '점심 식사' && e.status === 'IN_PROGRESS')} />}
         {effectiveViewMode === 'IN_PROGRESS' && <InProgressView />}
         {effectiveViewMode === 'PREPARATION' && <PreparationView />}
       </div>
