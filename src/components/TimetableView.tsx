@@ -1,22 +1,30 @@
 import { useEffect, useState } from 'react';
 import { useEventStore, type SportEvent } from '@/store/useEventStore';
 import TotalScoreBoard from './TotalScoreBoard';
+import { useIsMobile } from '@/hooks/use-mobile';
 import { motion } from 'framer-motion';
 
 const TimetableView = () => {
   const events = useEventStore((s) => s.events);
   const setEventStatus = useEventStore((s) => s.setEventStatus);
   const setViewMode = useEventStore((s) => s.setViewMode);
+  const isMobile = useIsMobile();
 
   const [scale, setScale] = useState(1);
   const [time, setTime] = useState(new Date());
 
   useEffect(() => {
-    const handleResize = () => setScale(Math.min(window.innerWidth / 1920, window.innerHeight / 1080));
+    const handleResize = () => {
+      const baseWidth = isMobile ? 1080 : 1920;
+      const baseHeight = isMobile ? 1920 : 1080;
+      const scaleW = window.innerWidth / baseWidth;
+      const scaleH = window.innerHeight / baseHeight;
+      setScale(Math.min(scaleW, scaleH));
+    };
     handleResize();
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
-  }, []);
+  }, [isMobile]);
 
   useEffect(() => {
     const timer = setInterval(() => setTime(new Date()), 1000);
@@ -41,15 +49,24 @@ const TimetableView = () => {
   return (
     <div className="fixed inset-0 z-40 bg-[#F4F4F4] overflow-hidden flex items-start justify-center animate-in fade-in duration-500">
       <div
-        className="relative w-[1920px] h-[1080px] shrink-0"
-        style={{ transform: `scale(${scale})`, transformOrigin: 'top' }}
+        className="relative shrink-0"
+        style={{
+          width: isMobile ? '1080px' : '1920px',
+          height: isMobile ? '1920px' : '1080px',
+          transform: `scale(${scale})`,
+          transformOrigin: 'top'
+        }}
       >
-        <img src="/assets/background/기본 화면(개막식).svg" className="absolute inset-0 w-full h-full object-cover -z-10" alt="" />
+        <img
+          src="/assets/background/기본 화면(개막식).svg"
+          className="absolute inset-0 w-full h-full object-cover -z-10"
+          alt=""
+        />
 
         <TotalScoreBoard />
 
-        {/* Vertical stripes for events */}
-        <div className="absolute top-[120px] left-0 flex w-[1920px] h-[493px]">
+        {/* Timetable Stripes */}
+        <div className={`absolute left-0 w-full flex ${isMobile ? 'top-[350px] flex-col h-[1000px] gap-4 px-10' : 'top-[120px] h-[493px]'}`}>
           {(() => {
             const currentTotalMinutes = time.getHours() * 60 + time.getMinutes();
             const getMinutes = (t: string) => {
@@ -71,38 +88,36 @@ const TimetableView = () => {
             });
 
             return effectiveEvents.map((event, index) => {
-              const isPink = index % 2 === 1; // Alternating based on image (Stripe 1 is White, 2 is Pink)
-              // White bg -> Magenta text (#ff40c2), Pink bg -> Black text (#000000)
+              const isPink = index % 2 === 1;
               const textColor = isPink ? 'text-black' : 'text-[#ff40c2]';
 
               return (
                 <div
                   key={event.id}
                   onClick={(e) => handleClick(e, event)}
-                  className={`relative flex-[1_1_100%] cursor-pointer transition-transform active:scale-95 flex flex-col items-center pt-[50.7px]`}
+                  className={`relative flex-[1_1_100%] cursor-pointer transition-transform active:scale-95 flex flex-col items-center justify-center overflow-hidden ${isMobile ? 'rounded-3xl bg-white/40 shadow-sm border border-white/50 py-10' : ''}`}
                 >
-                  {index === 1 && (
+                  <div className={`font-sans font-black ${isMobile ? 'text-[80px]' : 'text-[60px]'} ${textColor} leading-tight`}>
+                    {event.time}
+                  </div>
+                  <div className={`font-sans font-extrabold ${isMobile ? 'text-[110px]' : 'text-[80px]'} ${textColor} leading-tight text-center px-4`}>
+                    {event.name}
+                  </div>
+
+                  {event.status === 'IN_PROGRESS' && (
                     <motion.div
-                      initial={{ opacity: 1, y: -20, x: -140, rotate: 90 }}
-                      animate={{
-                        x: -110,
-                        y: -20,
-                      }}
-                      transition={{
-                        duration: 0.8,
-                        repeat: Infinity,
-                        repeatType: "reverse",
-                        ease: "easeInOut"
-                      }}
-                      className="w-[70px] h-[70px] absolute z-20"
+                      className={`absolute top-4 right-4 ${isMobile ? 'scale-[2]' : 'scale-1'}`}
+                      animate={{ scale: [1, 1.2, 1] }}
+                      transition={{ duration: 1, repeat: Infinity }}
                     >
-                      <img
-                        src="/assets/match-arrow.svg"
-                        className="w-full h-full"
-                        style={{ filter: 'brightness(0) invert(1)' }}
-                        alt=""
-                      />
+                      <div className="bg-red-500 text-white px-3 py-1 rounded text-[20px] font-bold uppercase tracking-wider shadow-lg">LIVE</div>
                     </motion.div>
+                  )}
+
+                  {event.effectiveStatus === 'COMPLETED' && (
+                    <div className="absolute inset-0 bg-black/5 flex items-center justify-center pointer-events-none">
+                      <div className="bg-gray-800/80 px-4 py-2 rounded text-white font-bold text-4xl uppercase tracking-widest">COMPLETED</div>
+                    </div>
                   )}
                 </div>
               );
@@ -111,7 +126,7 @@ const TimetableView = () => {
         </div>
 
         {/* Big Clock */}
-        <p className="absolute left-1/2 -translate-x-1/2 top-[580px] font-sans text-[395px] text-black leading-none tracking-[0.05em] m-0 whitespace-nowrap tabular-nums z-10 pointer-events-none shadow-none">
+        <p className={`absolute left-1/2 -translate-x-1/2 font-sans text-black leading-none tracking-[0.05em] m-0 whitespace-nowrap tabular-nums z-10 pointer-events-none shadow-none text-center ${isMobile ? 'bottom-[100px] text-[320px]' : 'top-[580px] text-[395px]'}`}>
           {hours}:{minutes}:{seconds}
         </p>
 
