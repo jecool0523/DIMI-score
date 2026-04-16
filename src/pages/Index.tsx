@@ -98,7 +98,7 @@ const DisplayPage = () => {
 
   return (
     <div
-      className="min-h-screen flex flex-col bg-[#F4F4F4]"
+      className="min-h-screen flex flex-col bg-[#F4F4F4] overflow-hidden"
       onDoubleClick={handleClick}
     >
       {/* Clock only when no specific view is active */}
