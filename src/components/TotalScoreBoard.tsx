@@ -60,23 +60,21 @@ const TotalScoreBoard = () => {
   const WHITE = "#ffffff";
 
   return (
-    <div className={`w-full flex justify-center bg-transparent z-10 absolute top-0 left-0 pointer-events-none`}>
-      <div
-        className={`content-stretch flex items-center relative shrink-0 bg-transparent overflow-hidden ${isMobile ? 'w-[1080px] h-[180px]' : 'w-[1920px] h-[120px]'}`}
-      >
+    <div className="w-full bg-transparent z-10 pointer-events-none">
+      <div className={`flex items-center relative w-full overflow-hidden ${isMobile ? 'h-[160px]' : 'h-[120px]'}`}>
         {/* Team A Bar (Blue) */}
         <motion.div
-          animate={{ width: widthA }}
+          animate={{ flexBasis: `${ratio * 100}%` }}
           transition={{ type: "spring", stiffness: 50, damping: 15 }}
-          className={`${isMobile ? 'h-[180px]' : 'h-[120px]'} relative shrink-0 overflow-hidden`}
+          className="h-full relative shrink-0 overflow-hidden flex items-center"
           style={{ backgroundColor: BLUE }}
         >
           {/* Left Score */}
-          <div className={`absolute font-sans leading-none font-black text-white whitespace-nowrap m-0 tracking-tighter z-20 ${isMobile ? 'left-[40px] text-[160px] top-[-15px]' : 'left-[45px] text-[120px] top-[-23px]'}`}>
+          <div className={`font-sans leading-none font-black text-white whitespace-nowrap m-0 tracking-tighter z-20 pl-[45px] ${isMobile ? 'text-[80px]' : 'text-[120px] mt-[-23px]'}`}>
             <RouletteNumber value={`${totalA.toLocaleString()}P`} />
           </div>
 
-          {/* Divider Blocks */}
+          {/* Pixel Divider Blocks (White part) */}
           <div className="absolute right-0 top-0 h-full w-[60px] pointer-events-none">
             <div className="absolute bg-white right-0 size-[20px] top-0" />
             <div className="absolute bg-white right-0 size-[20px] top-[20px]" />
@@ -84,28 +82,23 @@ const TotalScoreBoard = () => {
             <div className="absolute bg-white right-[20px] size-[20px] top-[60px]" />
             <div className="absolute bg-white right-0 size-[20px] top-[60px]" />
             <div className="absolute bg-white right-0 size-[20px] top-[100px]" />
-            {isMobile && (
-              <>
-                <div className="absolute bg-white right-[20px] size-[20px] top-[140px]" />
-                <div className="absolute bg-white right-0 size-[20px] top-[140px]" />
-              </>
-            )}
+            {isMobile && <div className="absolute bg-white right-0 size-[20px] top-[140px]" />}
           </div>
         </motion.div>
 
         {/* Team B Bar (White) */}
         <motion.div
-          animate={{ width: baseWidth - widthA }}
+          animate={{ flexBasis: `${(1 - ratio) * 100}%` }}
           transition={{ type: "spring", stiffness: 50, damping: 15 }}
-          className={`${isMobile ? 'h-[180px]' : 'h-[120px]'} relative shrink-0 overflow-hidden`}
+          className="h-full relative shrink-0 overflow-hidden flex items-center justify-end"
           style={{ backgroundColor: WHITE }}
         >
           {/* Right Score */}
-          <div className={`absolute font-sans leading-none font-black text-[#0081ff] whitespace-nowrap m-0 text-right tracking-tighter z-20 ${isMobile ? 'right-[40px] text-[160px] top-[-15px]' : 'right-[45px] text-[120px] top-[-23px]'}`}>
+          <div className={`font-sans leading-none font-black text-[#0081ff] whitespace-nowrap m-0 text-right tracking-tighter z-20 pr-[45px] ${isMobile ? 'text-[80px]' : 'text-[120px] mt-[-23px]'}`}>
             <RouletteNumber value={`${totalB.toLocaleString()}P`} />
           </div>
 
-          {/* Divider Blocks */}
+          {/* Pixel Divider Blocks (Blue part) */}
           <div className="absolute left-0 top-0 h-full w-[80px] pointer-events-none">
             <div className="absolute bg-[#0081ff] left-0 size-[20px] top-0" />
             <div className="absolute bg-[#0081ff] left-0 size-[20px] top-[40px]" />
@@ -117,13 +110,7 @@ const TotalScoreBoard = () => {
             <div className="absolute bg-[#0081ff] left-[40px] size-[20px] top-[60px]" />
             <div className="absolute bg-[#0081ff] left-[40px] size-[20px] top-[80px]" />
             <div className="absolute bg-[#0081ff] left-[20px] size-[20px] top-[80px]" />
-            {isMobile && (
-              <>
-                <div className="absolute bg-[#0081ff] left-0 size-[20px] top-[140px]" />
-                <div className="absolute bg-[#0081ff] left-[20px] size-[20px] top-[120px]" />
-                <div className="absolute bg-[#0081ff] left-[40px] size-[20px] top-[140px]" />
-              </>
-            )}
+            {isMobile && <div className="absolute bg-[#0081ff] left-0 size-[20px] top-[140px]" />}
           </div>
         </motion.div>
       </div>

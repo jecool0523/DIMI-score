@@ -5,6 +5,7 @@ import TotalScoreBoard from './TotalScoreBoard';
 import RouletteNumber from './RouletteNumber';
 import { motion } from 'framer-motion';
 import { useIsMobile } from '@/hooks/use-mobile';
+import MarqueeBanner from './MarqueeBanner';
 
 const InProgressView = () => {
   const events = useEventStore((s) => s.events);
@@ -110,40 +111,94 @@ const InProgressView = () => {
   const baseWidth = isMobile ? 1080 : 1920;
   const progressWidth = baseWidth * progress;
 
+  if (isMobile) {
+    return (
+      <div className="fixed inset-0 z-40 bg-[#F4F4F4] flex flex-col items-stretch animate-in fade-in duration-500 overflow-y-auto">
+        <img
+          src="/assets/background/종목화면.svg"
+          className="fixed inset-0 w-full h-full object-cover -z-10 opacity-30"
+          alt=""
+        />
+
+        <div className="shrink-0 bg-white/80 backdrop-blur-sm border-b border-gray-100">
+          <TotalScoreBoard />
+        </div>
+
+        <div className="flex-1 flex flex-col items-center justify-center gap-12 py-10 px-6">
+          <div className="text-center space-y-2">
+            <h2 className="text-5xl font-black text-black tracking-tight">{current.name}</h2>
+            <div className="text-3xl font-medium text-gray-600 tabular-nums">
+              {hours}:{minutes}:{seconds}
+            </div>
+          </div>
+
+          <div className="w-full space-y-8">
+            <div className="flex items-center justify-between gap-6">
+              <div className="flex-1 bg-white/60 backdrop-blur-sm rounded-3xl p-8 border border-white shadow-xl text-center">
+                <p className="text-sm font-black text-blue-600 mb-2 uppercase tracking-widest">TEAM A</p>
+                <div className="text-8xl font-black text-black">
+                  <RouletteNumber value={current.scoreA.toString()} />
+                </div>
+              </div>
+              <div className="flex-1 bg-white/60 backdrop-blur-sm rounded-3xl p-8 border border-white shadow-xl text-center">
+                <p className="text-sm font-black text-[#ff40c2] mb-2 uppercase tracking-widest">TEAM B</p>
+                <div className="text-8xl font-black text-black">
+                  <RouletteNumber value={current.scoreB.toString()} />
+                </div>
+              </div>
+            </div>
+
+            <div className="px-2 space-y-3">
+              <div className="flex justify-between text-xs font-black text-gray-500 uppercase tracking-tighter">
+                <span>Progress</span>
+                <span>{Math.round(progress * 100)}%</span>
+              </div>
+              <div className="h-4 bg-gray-200 rounded-full overflow-hidden shadow-inner">
+                <motion.div
+                  initial={{ width: 0 }}
+                  animate={{ width: `${progress * 100}%` }}
+                  className="h-full bg-gradient-to-r from-blue-500 to-[#ff40c2] shadow-[0_0_10px_rgba(59,130,246,0.3)]"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="h-[80px] shrink-0">
+          <MarqueeBanner />
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="fixed inset-0 z-40 bg-[#F4F4F4] flex items-start justify-center animate-in fade-in duration-500 overflow-hidden">
       <div
         className="relative shrink-0"
         style={{
-          width: isMobile ? '1080px' : '1920px',
-          height: isMobile ? '1920px' : '1080px',
+          width: '1920px',
+          height: '1080px',
           transform: `scale(${scale})`,
           transformOrigin: 'top'
         }}
       >
         <img
-          src={isMobile ? "/assets/background/모바일_종목화면.svg" : "/assets/background/종목화면.svg"}
+          src="/assets/background/종목화면.svg"
           className="absolute inset-0 w-full h-full object-cover -z-10"
           alt=""
-          onError={(e) => {
-            (e.target as HTMLImageElement).src = "/assets/background/종목화면.svg";
-          }}
         />
 
         <TotalScoreBoard />
 
-        {/* Unified Header: [Event Name] [Icons] [Clock] */}
-        <div className={`absolute left-0 w-full flex items-center z-30 ${isMobile ? 'top-[420px] flex-col gap-10' : 'top-[200px] h-[100px]'}`}>
-          {/* Event Name */}
-          <div className="flex-1 flex justify-center w-full">
-            <div className={`font-sans font-extrabold text-black whitespace-nowrap m-0 tracking-tight ${isMobile ? 'text-[160px]' : 'text-[130px]'}`}>
+        <div className="absolute top-[200px] left-0 w-[1920px] h-[100px] flex items-center z-30">
+          <div className="flex-1 flex justify-center">
+            <div className="font-sans font-extrabold text-[130px] text-black whitespace-nowrap m-0 tracking-tight">
               {current.name}
             </div>
           </div>
 
-          <div className="relative h-[100px] flex items-center justify-center shrink-0">
-            <div className={`${isMobile ? 'w-[640px]' : 'w-[480px]'} flex items-center justify-center relative h-full`}>
-              {/* Left Arrow */}
+          <div className="relative w-[480px] h-[100px] flex items-center justify-center shrink-0">
+            <div className="w-[480px] flex items-center justify-center relative h-full">
               <motion.div
                 className="absolute left-0 w-[100px] h-[100px] pt-[10px]"
                 initial={{ opacity: 0, x: 60, rotate: -90 }}
@@ -163,12 +218,10 @@ const InProgressView = () => {
                 <img src="/assets/match-arrow.svg" className="w-full h-full" alt="" />
               </motion.div>
 
-              {/* Loop Icon */}
-              <div className={isMobile ? 'w-[180px] h-[100px]' : 'w-[143px] h-[81px]'}>
+              <div className="w-[143px] h-[81px]">
                 <img src="/assets/match-loop.svg" className="w-full h-full" alt="" />
               </div>
 
-              {/* Right Arrow */}
               <motion.div
                 className="absolute right-0 w-[100px] h-[100px] pt-[10px]"
                 initial={{ opacity: 0, x: -60, rotate: 90 }}
@@ -190,33 +243,30 @@ const InProgressView = () => {
             </div>
           </div>
 
-          {/* Clock Text */}
-          <div className="flex-1 flex justify-center w-full">
-            <div className={`font-sans text-black whitespace-nowrap m-0 tabular-nums font-[400] leading-none text-center ${isMobile ? 'text-[200px]' : 'text-[152.68px]'}`}>
+          <div className="flex-1 flex justify-center">
+            <div className="font-sans text-[152.68px] text-black whitespace-nowrap m-0 tabular-nums font-[400] leading-none text-center">
               {hours}:{minutes}:{seconds}
             </div>
           </div>
         </div>
 
-        {/* Progress Bar */}
-        <div className={`absolute left-0 w-full z-20 ${isMobile ? 'top-[950px] h-[40px]' : 'top-[386px] h-[25px]'}`}>
+        <div className="absolute top-[386px] left-0 w-[1920px] h-[25px] z-20">
           <div
             className="h-full bg-[#FF5297] transition-all duration-1000 ease-linear"
             style={{ width: `${progressWidth}px` }}
           />
         </div>
 
-        {/* Main Center Area */}
-        <div className={`absolute left-0 w-full overflow-hidden flex items-center justify-between ${isMobile ? 'top-[1150px]' : 'top-[470px]'}`}>
-          <div className={`flex flex-[1_0_0] items-center justify-center ${isMobile ? 'flex-col gap-10' : 'gap-[632px] px-[280px]'}`}>
-            <div className={`${isMobile ? 'w-[600px] h-[400px]' : 'w-[300px] h-[450px]'} flex items-center justify-center pt-[20px]`}>
-              <span className={`font-sans text-black tabular-nums drop-shadow-md pb-[40px] ${isMobile ? 'text-[600px]' : 'text-[500px]'}`}>
+        <div className="absolute top-[470px] left-0 w-[1920px] overflow-hidden flex items-center justify-between">
+          <div className="flex flex-[1_0_0] items-center justify-center gap-[632px] px-[280px]">
+            <div className="w-[300px] h-[450px] flex items-center justify-center pt-[20px]">
+              <span className="font-sans text-[500px] text-black tabular-nums drop-shadow-md pb-[40px]">
                 <RouletteNumber value={current.scoreA.toString()} />
               </span>
             </div>
 
-            <div className={`${isMobile ? 'w-[600px] h-[400px]' : 'w-[300px] h-[450px]'} flex items-center justify-center pt-[20px]`}>
-              <span className={`font-sans text-black tabular-nums drop-shadow-md pb-[40px] ${isMobile ? 'text-[600px]' : 'text-[500px]'}`}>
+            <div className="w-[300px] h-[450px] flex items-center justify-center pt-[20px]">
+              <span className="font-sans text-[500px] text-black tabular-nums drop-shadow-md pb-[40px]">
                 <RouletteNumber value={current.scoreB.toString()} />
               </span>
             </div>

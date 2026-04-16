@@ -46,13 +46,100 @@ const TimetableView = () => {
   const minutes = time.getMinutes().toString().padStart(2, '0');
   const seconds = time.getSeconds().toString().padStart(2, '0');
 
+  if (isMobile) {
+    return (
+      <div className="fixed inset-0 z-40 bg-[#F4F4F4] flex flex-col items-stretch animate-in fade-in duration-500 overflow-y-auto">
+        <img
+          src="/assets/background/기본 화면(개막식).svg"
+          className="fixed inset-0 w-full h-full object-cover -z-10 opacity-30"
+          alt=""
+        />
+
+        <div className="shrink-0 bg-white/80 backdrop-blur-sm border-b border-gray-100">
+          <TotalScoreBoard />
+        </div>
+
+        <div className="flex-1 p-6 space-y-6 pb-32">
+          <h2 className="text-4xl font-black text-black tracking-tight mb-8">Match Schedule</h2>
+
+          <div className="space-y-4">
+            {(() => {
+              const currentTotalMinutes = time.getHours() * 60 + time.getMinutes();
+              const getMinutes = (t: string) => {
+                const [h, m] = t.split(':').map(Number);
+                return h * 60 + m;
+              };
+
+              const effectiveEvents = events.map((ev, idx) => {
+                const nextEv = events[idx + 1];
+                const isTimeCompleted = nextEv
+                  ? currentTotalMinutes >= getMinutes(nextEv.time)
+                  : currentTotalMinutes >= getMinutes(ev.time) + 60;
+
+                let effStatus = ev.status;
+                if (effStatus === 'UPCOMING' && isTimeCompleted) {
+                  effStatus = 'COMPLETED';
+                }
+                return { ...ev, effectiveStatus: effStatus };
+              });
+
+              return effectiveEvents.map((event, index) => {
+                const isPink = index % 2 === 1;
+                const textColor = isPink ? 'text-blue-600' : 'text-[#ff40c2]';
+
+                return (
+                  <div
+                    key={event.id}
+                    onClick={(e) => handleClick(e, event)}
+                    className="relative bg-white/60 backdrop-blur-md rounded-2xl p-6 border border-white shadow-lg flex items-center justify-between active:scale-95 transition-transform"
+                  >
+                    <div>
+                      <div className={`text-2xl font-black ${textColor}`}>
+                        {event.time}
+                      </div>
+                      <div className="text-3xl font-extrabold text-black">
+                        {event.name}
+                      </div>
+                    </div>
+
+                    {event.status === 'IN_PROGRESS' && (
+                      <motion.div
+                        animate={{ opacity: [1, 0.5, 1] }}
+                        transition={{ duration: 1, repeat: Infinity }}
+                        className="bg-red-500 text-white px-3 py-1 rounded-full text-sm font-bold"
+                      >
+                        LIVE
+                      </motion.div>
+                    )}
+
+                    {event.effectiveStatus === 'COMPLETED' && (
+                      <div className="text-gray-400 font-bold text-sm uppercase tracking-widest">
+                        DONE
+                      </div>
+                    )}
+                  </div>
+                );
+              });
+            })()}
+          </div>
+        </div>
+
+        <div className="fixed bottom-0 left-0 w-full h-24 bg-white/90 backdrop-blur-md border-t border-gray-100 flex items-center justify-center z-50">
+          <p className="font-sans text-5xl text-black font-black tabular-nums tracking-tighter">
+            {hours}:{minutes}:{seconds}
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="fixed inset-0 z-40 bg-[#F4F4F4] overflow-hidden flex items-start justify-center animate-in fade-in duration-500">
       <div
         className="relative shrink-0"
         style={{
-          width: isMobile ? '1080px' : '1920px',
-          height: isMobile ? '1920px' : '1080px',
+          width: '1920px',
+          height: '1080px',
           transform: `scale(${scale})`,
           transformOrigin: 'top'
         }}
@@ -65,8 +152,7 @@ const TimetableView = () => {
 
         <TotalScoreBoard />
 
-        {/* Timetable Stripes */}
-        <div className={`absolute left-0 w-full flex ${isMobile ? 'top-[350px] flex-col h-[1000px] gap-4 px-10' : 'top-[120px] h-[493px]'}`}>
+        <div className="absolute top-[120px] left-0 w-full flex h-[493px]">
           {(() => {
             const currentTotalMinutes = time.getHours() * 60 + time.getMinutes();
             const getMinutes = (t: string) => {
@@ -95,18 +181,18 @@ const TimetableView = () => {
                 <div
                   key={event.id}
                   onClick={(e) => handleClick(e, event)}
-                  className={`relative flex-[1_1_100%] cursor-pointer transition-transform active:scale-95 flex flex-col items-center justify-center overflow-hidden ${isMobile ? 'rounded-3xl bg-white/40 shadow-sm border border-white/50 py-10' : ''}`}
+                  className="relative flex-[1_1_100%] cursor-pointer transition-transform active:scale-95 flex flex-col items-center justify-center overflow-hidden"
                 >
-                  <div className={`font-sans font-black ${isMobile ? 'text-[80px]' : 'text-[60px]'} ${textColor} leading-tight`}>
+                  <div className="font-sans font-black text-[60px] text-zinc-900 leading-tight">
                     {event.time}
                   </div>
-                  <div className={`font-sans font-extrabold ${isMobile ? 'text-[110px]' : 'text-[80px]'} ${textColor} leading-tight text-center px-4`}>
+                  <div className={`font-sans font-extrabold text-[80px] ${textColor} leading-tight text-center px-4`}>
                     {event.name}
                   </div>
 
                   {event.status === 'IN_PROGRESS' && (
                     <motion.div
-                      className={`absolute top-4 right-4 ${isMobile ? 'scale-[2]' : 'scale-1'}`}
+                      className="absolute top-4 right-4"
                       animate={{ scale: [1, 1.2, 1] }}
                       transition={{ duration: 1, repeat: Infinity }}
                     >
@@ -125,8 +211,7 @@ const TimetableView = () => {
           })()}
         </div>
 
-        {/* Big Clock */}
-        <p className={`absolute left-1/2 -translate-x-1/2 font-sans text-black leading-none tracking-[0.05em] m-0 whitespace-nowrap tabular-nums z-10 pointer-events-none shadow-none text-center ${isMobile ? 'bottom-[100px] text-[320px]' : 'top-[580px] text-[395px]'}`}>
+        <p className="absolute left-1/2 -translate-x-1/2 top-[580px] font-sans text-[395px] text-black leading-none tracking-[0.05em] m-0 whitespace-nowrap tabular-nums z-10 pointer-events-none shadow-none text-center">
           {hours}:{minutes}:{seconds}
         </p>
 

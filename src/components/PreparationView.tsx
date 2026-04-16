@@ -3,6 +3,7 @@ import { useEventStore } from '@/store/useEventStore';
 import TotalScoreBoard from './TotalScoreBoard';
 import { motion } from 'framer-motion';
 import { useIsMobile } from '@/hooks/use-mobile';
+import MarqueeBanner from './MarqueeBanner';
 
 const PreparationView = () => {
   const events = useEventStore((s) => s.events);
@@ -46,13 +47,75 @@ const PreparationView = () => {
 
   const arrowTransitions = [0, 0.4, 0.8];
 
+  if (isMobile) {
+    return (
+      <div className="fixed inset-0 z-40 bg-[#F4F4F4] flex flex-col items-stretch animate-in fade-in duration-500 overflow-y-auto">
+        <img
+          src="/assets/background/준비화면.svg"
+          className="fixed inset-0 w-full h-full object-cover -z-10 opacity-30"
+          alt=""
+        />
+
+        <div className="shrink-0 bg-white/80 backdrop-blur-sm border-b border-gray-100">
+          <TotalScoreBoard />
+        </div>
+
+        <div className="flex-1 flex flex-col items-center justify-center p-8 gap-16">
+          <div className="space-y-4 text-center">
+            <p className="text-xl font-black text-blue-600 uppercase tracking-[0.2em]">Next Event</p>
+            <h2 className="text-6xl font-black text-black leading-tight tracking-tighter break-keep">
+              {nextEvent.name}
+            </h2>
+          </div>
+
+          <div className="flex flex-col items-center gap-2">
+            <div className="text-9xl font-black text-[#ff40c2] tabular-nums tracking-tighter">
+              {hours}:{minutes}
+            </div>
+            <div className="text-4xl font-bold text-[#ff40c2]/60 tabular-nums">
+              {seconds}
+            </div>
+          </div>
+
+          <div className="flex items-center gap-8">
+            {arrowTransitions.map((delay, i) => (
+              <motion.div
+                key={i}
+                className="w-16 h-16"
+                initial={{ opacity: 0, x: -20, rotate: 90 }}
+                animate={{
+                  opacity: [0, 1, 1, 0],
+                  x: [-20, 0, 0, 20],
+                  rotate: 90,
+                }}
+                transition={{
+                  duration: 2,
+                  times: [0, 0.1, 0.9, 1],
+                  repeat: Infinity,
+                  repeatDelay: 1,
+                  delay: delay
+                }}
+              >
+                <img src="/assets/match-arrow.svg" className="w-full h-full" alt="" />
+              </motion.div>
+            ))}
+          </div>
+        </div>
+
+        <div className="h-24 shrink-0">
+          <MarqueeBanner />
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="fixed inset-0 z-40 bg-[#F4F4F4] overflow-hidden flex items-start justify-center animate-in fade-in duration-500">
       <div
         className="relative shrink-0"
         style={{
-          width: isMobile ? '1080px' : '1920px',
-          height: isMobile ? '1920px' : '1080px',
+          width: '1920px',
+          height: '1080px',
           transform: `scale(${scale})`,
           transformOrigin: 'top'
         }}
@@ -61,28 +124,25 @@ const PreparationView = () => {
 
         <TotalScoreBoard />
 
-        {/* Content Box (Left/Top) */}
-        <div className={`absolute left-0 w-full flex items-center justify-center ${isMobile ? 'top-[420px] h-[500px]' : 'top-[120px] w-[916px] h-[861px]'}`}>
-          <p className={`font-sans font-extrabold leading-tight text-black text-center whitespace-normal m-0 tracking-tight break-keep ${isMobile ? 'text-[180px]' : 'text-[205.4px] px-[71.3px]'}`}>
+        <div className="absolute top-[120px] left-0 w-[916px] h-[861px] flex items-center justify-center">
+          <p className="font-sans font-extrabold leading-tight text-black text-center whitespace-normal m-0 tracking-tight break-keep text-[205.4px] px-[71.3px]">
             {nextEvent.name}
           </p>
         </div>
 
-        {/* Content Box (Right/Center Clock) */}
-        <div className={`absolute flex items-center justify-center ${isMobile ? 'top-[950px] left-0 w-full h-[300px]' : 'top-[120px] left-[917px] w-[1003px] h-[535px]'}`}>
-          <div className={`font-sans leading-[0.9] text-[#ff40c2] m-0 flex tabular-nums gap-4 z-10 font-black ${isMobile ? 'text-[240px] flex-row' : 'text-[170px] flex-col text-right pr-[120px]'}`}>
-            <span>{hours}{isMobile ? ':' : ''}</span>
-            <span>{minutes}{isMobile ? ':' : ''}</span>
+        <div className="absolute top-[120px] left-[917px] w-[1003px] h-[535px] flex items-center justify-center">
+          <div className="font-sans leading-[0.9] text-[#ff40c2] m-0 flex flex-col text-right pr-[120px] tabular-nums gap-0 z-10 font-black text-[170px]">
+            <span>{hours}</span>
+            <span>{minutes}</span>
             <span>{seconds}</span>
           </div>
         </div>
 
-        {/* Content Box (Bottom Arrows) */}
-        <div className={`absolute flex items-center justify-center gap-[100px] ${isMobile ? 'top-[1300px] left-0 w-full h-[400px]' : 'top-[656px] left-0 w-[1046px] h-[325px] px-[150px]'}`}>
+        <div className="absolute top-[656px] left-0 w-[1046px] h-[325px] flex items-center gap-[100px] px-[150px]">
           {arrowTransitions.map((delay, i) => (
             <motion.div
               key={i}
-              className={`${isMobile ? 'w-[250px] h-[250px]' : 'w-[175px] h-[175px]'}`}
+              className="w-[175px] h-[175px]"
               initial={{ opacity: 0, x: -60, rotate: 90 }}
               animate={{
                 opacity: [0, 1, 1, 0],
@@ -102,7 +162,6 @@ const PreparationView = () => {
             </motion.div>
           ))}
         </div>
-
       </div>
     </div>
   );
