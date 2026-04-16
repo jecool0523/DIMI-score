@@ -1,5 +1,7 @@
 import { create } from 'zustand';
+import type { RealtimeChannel } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
+import type { Tables } from '@/integrations/supabase/types';
 
 export type EventStatus = 'UPCOMING' | 'IN_PROGRESS' | 'COMPLETED';
 export type ViewMode = 'TIMETABLE' | 'IN_PROGRESS' | 'PREPARATION';
@@ -34,6 +36,43 @@ interface EventStore {
   triggerAnnouncement: () => void;
 }
 
+type AppStateRow = Tables<'app_state'>;
+type EventRow = Tables<'events'>;
+
+type StoreRuntime = {
+  initialized: boolean;
+  listenersBound: boolean;
+  pollingTimer: number | null;
+  realtimeChannel: RealtimeChannel | null;
+  realtimeStatus: string;
+  reconnectTimer: number | null;
+  syncPromise: Promise<void> | null;
+};
+
+type EventStoreWindow = Window & {
+  __eventStoreRuntime?: StoreRuntime;
+};
+
+const APP_STATE_ID = 1;
+const DEFAULT_ANNOUNCEMENT = '🎉 제25회 체육대회에 오신 것을 환영합니다! 안전하고 즐거운 대회가 되길 바랍니다.';
+const POLLING_INTERVAL_MS = 2000;
+const REALTIME_RETRY_MS = 3000;
+
+const createStoreRuntime = (): StoreRuntime => ({
+  initialized: false,
+  listenersBound: false,
+  pollingTimer: null,
+  realtimeChannel: null,
+  realtimeStatus: 'IDLE',
+  reconnectTimer: null,
+  syncPromise: null,
+});
+
+const storeRuntime: StoreRuntime =
+  typeof window === 'undefined'
+    ? createStoreRuntime()
+    : (((window as EventStoreWindow).__eventStoreRuntime ??= createStoreRuntime()) as StoreRuntime);
+
 const defaultEvents: SportEvent[] = [
   { id: '1', name: '개회식', time: '09:00', icon: 'Flag', status: 'COMPLETED', scoreA: 0, scoreB: 0 },
   { id: '2', name: '사제족구', time: '09:30', icon: 'Circle', status: 'COMPLETED', teamA: '1학년', teamB: '2학년', scoreA: 3, scoreB: 2 },
@@ -45,9 +84,297 @@ const defaultEvents: SportEvent[] = [
   { id: '8', name: '폐회식', time: '14:00', icon: 'Trophy', status: 'UPCOMING', scoreA: 0, scoreB: 0 },
 ];
 
+const defaultAppState: AppStateRow = {
+  id: APP_STATE_ID,
+  view_mode: 'TIMETABLE',
+  announcement: DEFAULT_ANNOUNCEMENT,
+  announcement_timestamp: 0,
+  bonus_score_a: 0,
+  bonus_score_b: 0,
+};
+
+const defaultEventRows: EventRow[] = defaultEvents.map((event) => ({
+  id: event.id,
+  name: event.name,
+  time: event.time,
+  icon: event.icon,
+  status: event.status,
+  team_a: event.teamA ?? null,
+  team_b: event.teamB ?? null,
+  score_a: event.scoreA,
+  score_b: event.scoreB,
+  actual_start_time: event.actualStartTime ?? null,
+}));
+
+const mapEventRow = (event: EventRow): SportEvent => ({
+  id: event.id,
+  name: event.name,
+  time: event.time,
+  icon: event.icon,
+  status: event.status as EventStatus,
+  teamA: event.team_a ?? undefined,
+  teamB: event.team_b ?? undefined,
+  scoreA: event.score_a,
+  scoreB: event.score_b,
+  actualStartTime: event.actual_start_time ? Number(event.actual_start_time) : undefined,
+});
+
+const applyAppState = (appState: AppStateRow) => {
+  useEventStore.setState({
+    viewMode: appState.view_mode as ViewMode,
+    announcement: appState.announcement,
+    announcementTimestamp: Number(appState.announcement_timestamp),
+    bonusScoreA: appState.bonus_score_a,
+    bonusScoreB: appState.bonus_score_b,
+  });
+};
+
+const applyEvents = (events: EventRow[]) => {
+  useEventStore.setState({
+    events: events
+      .map(mapEventRow)
+      .sort((a, b) => a.time.localeCompare(b.time)),
+  });
+};
+
+const loadAppState = async () => {
+  console.log('📡 Fetching app state...');
+  const { data, error } = await supabase
+    .from('app_state')
+    .select('*')
+    .eq('id', APP_STATE_ID)
+    .maybeSingle();
+
+  if (error) {
+    console.error('❌ Error fetching app state:', error);
+    return;
+  }
+
+  if (data) {
+    applyAppState(data);
+    return;
+  }
+
+  console.log('ℹ️ App state row not found, creating initial row...');
+  const { data: inserted, error: insertError } = await supabase
+    .from('app_state')
+    .insert(defaultAppState)
+    .select('*')
+    .single();
+
+  if (insertError) {
+    console.error('❌ Error inserting initial app state:', insertError);
+    applyAppState(defaultAppState);
+    return;
+  }
+
+  applyAppState(inserted);
+};
+
+const loadEvents = async () => {
+  console.log('📡 Fetching events...');
+  const { data, error } = await supabase
+    .from('events')
+    .select('*')
+    .order('time', { ascending: true });
+
+  if (error) {
+    console.error('❌ Error fetching events:', error);
+    return;
+  }
+
+  if (data && data.length > 0) {
+    applyEvents(data);
+    return;
+  }
+
+  console.log('ℹ️ No events in database, seeding default data...');
+  const { data: inserted, error: insertError } = await supabase
+    .from('events')
+    .insert(defaultEventRows)
+    .select('*');
+
+  if (insertError) {
+    console.error('❌ Error seeding default events:', insertError);
+
+    const { data: refetched, error: refetchError } = await supabase
+      .from('events')
+      .select('*')
+      .order('time', { ascending: true });
+
+    if (refetchError) {
+      console.error('❌ Error refetching events after seed failure:', refetchError);
+      useEventStore.setState({ events: defaultEvents });
+      return;
+    }
+
+    if (refetched && refetched.length > 0) {
+      applyEvents(refetched);
+      return;
+    }
+
+    useEventStore.setState({ events: defaultEvents });
+    return;
+  }
+
+  applyEvents(inserted ?? defaultEventRows);
+};
+
+const syncFromDatabase = async (reason: string) => {
+  if (storeRuntime.syncPromise) {
+    return storeRuntime.syncPromise;
+  }
+
+  storeRuntime.syncPromise = (async () => {
+    console.log(`🔄 Syncing store (${reason})...`);
+    await Promise.all([loadAppState(), loadEvents()]);
+  })().finally(() => {
+    storeRuntime.syncPromise = null;
+  });
+
+  return storeRuntime.syncPromise;
+};
+
+const stopPolling = () => {
+  if (typeof window === 'undefined' || storeRuntime.pollingTimer === null) {
+    return;
+  }
+
+  window.clearInterval(storeRuntime.pollingTimer);
+  storeRuntime.pollingTimer = null;
+  console.log('🟢 Fallback polling stopped');
+};
+
+const startPolling = () => {
+  if (typeof window === 'undefined' || storeRuntime.pollingTimer !== null) {
+    return;
+  }
+
+  console.log('🟡 Starting fallback polling...');
+  storeRuntime.pollingTimer = window.setInterval(() => {
+    void syncFromDatabase('polling');
+  }, POLLING_INTERVAL_MS);
+};
+
+const clearReconnectTimer = () => {
+  if (typeof window === 'undefined' || storeRuntime.reconnectTimer === null) {
+    return;
+  }
+
+  window.clearTimeout(storeRuntime.reconnectTimer);
+  storeRuntime.reconnectTimer = null;
+};
+
+const scheduleRealtimeReconnect = () => {
+  if (typeof window === 'undefined' || storeRuntime.reconnectTimer !== null) {
+    return;
+  }
+
+  storeRuntime.reconnectTimer = window.setTimeout(() => {
+    storeRuntime.reconnectTimer = null;
+    void startRealtime();
+  }, REALTIME_RETRY_MS);
+};
+
+const handleRealtimeStatus = (status: string) => {
+  storeRuntime.realtimeStatus = status;
+  console.log('📡 Realtime status:', status);
+
+  if (status === 'SUBSCRIBED') {
+    clearReconnectTimer();
+    stopPolling();
+    return;
+  }
+
+  if (status === 'TIMED_OUT' || status === 'CHANNEL_ERROR' || status === 'CLOSED') {
+    startPolling();
+    void syncFromDatabase(`realtime:${status.toLowerCase()}`);
+    scheduleRealtimeReconnect();
+  }
+};
+
+const resetRealtimeChannel = async () => {
+  clearReconnectTimer();
+
+  if (!storeRuntime.realtimeChannel) {
+    return;
+  }
+
+  const channel = storeRuntime.realtimeChannel;
+  storeRuntime.realtimeChannel = null;
+  storeRuntime.realtimeStatus = 'IDLE';
+
+  try {
+    await supabase.removeChannel(channel);
+  } catch (error) {
+    console.error('❌ Error removing realtime channel:', error);
+  }
+};
+
+const startRealtime = async () => {
+  if (typeof window === 'undefined') {
+    return;
+  }
+
+  if (
+    storeRuntime.realtimeChannel &&
+    (storeRuntime.realtimeStatus === 'CONNECTING' || storeRuntime.realtimeStatus === 'SUBSCRIBED')
+  ) {
+    return;
+  }
+
+  await resetRealtimeChannel();
+
+  console.log('📡 Setting up realtime listeners...');
+  const channel = supabase.channel(`db-changes-${Date.now()}`);
+  storeRuntime.realtimeChannel = channel;
+  storeRuntime.realtimeStatus = 'CONNECTING';
+
+  channel
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'app_state' }, () => {
+      console.log('🔔 App state change received');
+      void syncFromDatabase('realtime:app_state');
+    })
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'events' }, () => {
+      console.log('🔔 Event change received');
+      void syncFromDatabase('realtime:events');
+    })
+    .subscribe((status) => {
+      if (storeRuntime.realtimeChannel !== channel) {
+        return;
+      }
+
+      handleRealtimeStatus(status);
+    });
+};
+
+const bindBrowserSyncListeners = () => {
+  if (typeof window === 'undefined' || storeRuntime.listenersBound) {
+    return;
+  }
+
+  const resync = () => {
+    void syncFromDatabase('browser-event');
+
+    if (storeRuntime.realtimeStatus !== 'SUBSCRIBED') {
+      void startRealtime();
+    }
+  };
+
+  window.addEventListener('focus', resync);
+  window.addEventListener('online', resync);
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') {
+      resync();
+    }
+  });
+
+  storeRuntime.listenersBound = true;
+};
+
 export const useEventStore = create<EventStore>((set, get) => ({
   viewMode: 'TIMETABLE',
-  announcement: '🎉 제25회 체육대회에 오신 것을 환영합니다! 안전하고 즐거운 대회가 되길 바랍니다.',
+  announcement: DEFAULT_ANNOUNCEMENT,
   announcementTimestamp: 0,
   events: defaultEvents, // Initial state should be defaults to show something while loading
   bonusScoreA: 0,
@@ -55,7 +382,7 @@ export const useEventStore = create<EventStore>((set, get) => ({
 
   setViewMode: async (mode) => {
     set({ viewMode: mode });
-    const { error } = await supabase.from('app_state').update({ view_mode: mode }).eq('id', 1);
+    const { error } = await supabase.from('app_state').update({ view_mode: mode }).eq('id', APP_STATE_ID);
     if (error) console.error('Error setting view mode:', error);
   },
   setAnnouncement: async (text) => {
@@ -64,7 +391,7 @@ export const useEventStore = create<EventStore>((set, get) => ({
     const { error } = await supabase.from('app_state').update({
       announcement: text,
       announcement_timestamp: timestamp
-    }).eq('id', 1);
+    }).eq('id', APP_STATE_ID);
     if (error) console.error('Error setting announcement:', error);
   },
 
@@ -123,163 +450,37 @@ export const useEventStore = create<EventStore>((set, get) => ({
     const { error } = await supabase.from('app_state').update({
       bonus_score_a: newBonusA,
       bonus_score_b: newBonusB
-    }).eq('id', 1);
+    }).eq('id', APP_STATE_ID);
     if (error) console.error('Error updating bonus score:', error);
   },
 
   resetBonusScore: async () => {
     set({ bonusScoreA: 0, bonusScoreB: 0 });
-    const { error } = await supabase.from('app_state').update({ bonus_score_a: 0, bonus_score_b: 0 }).eq('id', 1);
+    const { error } = await supabase.from('app_state').update({ bonus_score_a: 0, bonus_score_b: 0 }).eq('id', APP_STATE_ID);
     if (error) console.error('Error resetting bonus score:', error);
   },
 
   triggerAnnouncement: async () => {
     const timestamp = Date.now();
     set({ announcementTimestamp: timestamp });
-    const { error } = await supabase.from('app_state').update({ announcement_timestamp: timestamp }).eq('id', 1);
+    const { error } = await supabase.from('app_state').update({ announcement_timestamp: timestamp }).eq('id', APP_STATE_ID);
     if (error) console.error('Error triggering announcement:', error);
   },
 }));
 
-// Initialize data and setup realtime
 const initStore = async () => {
+  if (storeRuntime.initialized) {
+    return;
+  }
+
+  storeRuntime.initialized = true;
   console.log('🔄 Initializing Supabase store...');
 
   try {
-    // 1. Fetch App State
-    console.log('📡 Fetching app state...');
-    const { data: appState, error: appError } = await supabase.from('app_state').select('*').single();
-
-    if (appError) {
-      console.error('❌ Error fetching app state:', appError);
-      if (appError.code === 'PGRST116') { // Not found - singleton row doesn't exist yet
-        console.log('ℹ️ App state row not found, creating initial row...');
-        const { error: insertError } = await supabase.from('app_state').insert([{
-          id: 1,
-          view_mode: 'TIMETABLE',
-          announcement: '🎉 제25회 체육대회에 오신 것을 환영합니다! 안전하고 즐거운 대회가 되길 바랍니다.',
-          announcement_timestamp: 0,
-          bonus_score_a: 0,
-          bonus_score_b: 0
-        }]);
-        if (insertError) console.error('❌ Error inserting initial app state:', insertError);
-      }
-    } else if (appState) {
-      console.log('✅ App state fetched successfully');
-      useEventStore.setState({
-        viewMode: appState.view_mode as any,
-        announcement: appState.announcement,
-        announcementTimestamp: Number(appState.announcement_timestamp),
-        bonusScoreA: appState.bonus_score_a,
-        bonusScoreB: appState.bonus_score_b,
-      });
-    }
-
-    // 2. Fetch Events
-    console.log('📡 Fetching events...');
-    const { data: events, error: eventsError } = await supabase.from('events').select('*').order('time');
-
-    if (eventsError) {
-      console.error('❌ Error fetching events:', eventsError);
-      // On error, we keep the defaultEvents set in the initial state
-    } else if (!events || events.length === 0) {
-      console.log('ℹ️ No events in database, seeding default data...');
-      const initialEvents = defaultEvents.map(e => ({
-        id: e.id,
-        name: e.name,
-        time: e.time,
-        icon: e.icon,
-        status: e.status,
-        team_a: e.teamA || null,
-        team_b: e.teamB || null,
-        score_a: e.scoreA,
-        score_b: e.scoreB,
-        actual_start_time: e.actualStartTime || null
-      }));
-      const { error: insertError } = await supabase.from('events').insert(initialEvents);
-      if (insertError) {
-        console.error('❌ Error seeding default events:', insertError);
-      } else {
-        console.log('✅ Default events seeded successfully');
-      }
-      // state is already defaultEvents by initial state, but let's be explicit
-      useEventStore.setState({ events: defaultEvents });
-    } else {
-      console.log(`✅ ${events.length} events fetched successfully`);
-      useEventStore.setState({
-        events: events.map(e => ({
-          id: e.id,
-          name: e.name,
-          time: e.time,
-          icon: e.icon,
-          status: e.status as any,
-          teamA: e.team_a || undefined,
-          teamB: e.team_b || undefined,
-          scoreA: e.score_a,
-          scoreB: e.score_b,
-          actualStartTime: e.actual_start_time ? Number(e.actual_start_time) : undefined
-        }))
-      });
-    }
-
-    // 3. Setup Realtime Listeners
-    console.log('📡 Setting up realtime listeners...');
-    const channel = supabase
-      .channel('db-changes')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'app_state' }, (payload) => {
-        console.log('🔔 App state update received:', payload);
-        const newData = payload.new as any;
-        if (newData) {
-          useEventStore.setState({
-            viewMode: newData.view_mode,
-            announcement: newData.announcement,
-            announcementTimestamp: Number(newData.announcement_timestamp),
-            bonusScoreA: newData.bonus_score_a,
-            bonusScoreB: newData.bonus_score_b,
-          });
-        }
-      })
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'events' }, (payload) => {
-        console.log('🔔 Event update received:', payload);
-        const newEvent = payload.new as any;
-        const oldEvent = payload.old as any;
-
-        if (payload.eventType === 'DELETE') {
-          useEventStore.setState((state) => ({
-            events: state.events.filter(e => e.id !== oldEvent.id)
-          }));
-        } else if (newEvent) {
-          useEventStore.setState((state) => {
-            const mappedEvent = {
-              id: newEvent.id,
-              name: newEvent.name,
-              time: newEvent.time,
-              icon: newEvent.icon,
-              status: newEvent.status,
-              teamA: newEvent.team_a || undefined,
-              teamB: newEvent.team_b || undefined,
-              scoreA: newEvent.score_a,
-              scoreB: newEvent.score_b,
-              actualStartTime: newEvent.actual_start_time ? Number(newEvent.actual_start_time) : undefined
-            };
-
-            const exists = state.events.some(e => e.id === mappedEvent.id);
-            if (exists) {
-              return {
-                events: state.events.map(e => e.id === mappedEvent.id ? mappedEvent : e)
-              };
-            } else {
-              return {
-                events: [...state.events, mappedEvent].sort((a, b) => a.time.localeCompare(b.time))
-              };
-            }
-          });
-        }
-      })
-      .subscribe((status) => {
-        console.log('📡 Realtime status:', status);
-      });
-
+    bindBrowserSyncListeners();
+    startPolling();
+    await syncFromDatabase('initial');
+    await startRealtime();
   } catch (err) {
     console.error('💥 Critical error in initStore:', err);
   }
