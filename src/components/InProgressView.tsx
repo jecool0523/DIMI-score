@@ -3,7 +3,7 @@ import { useEventStore } from '@/store/useEventStore';
 import confetti from 'canvas-confetti';
 import TotalScoreBoard from './TotalScoreBoard';
 import RouletteNumber from './RouletteNumber';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useIsMobile } from '@/hooks/use-mobile';
 import MarqueeBanner from './MarqueeBanner';
 
@@ -111,6 +111,9 @@ const InProgressView = () => {
   const totalSeconds = Math.floor(remainingMs / 1000);
   const remMinutes = Math.floor(totalSeconds / 60).toString().padStart(2, '0');
   const remSeconds = (totalSeconds % 60).toString().padStart(2, '0');
+
+  const secondsLeft = Math.ceil(remainingMs / 1000);
+  const showOverlay = remainingMs > 0 && remainingMs <= 10000;
 
   // Progress Calculation
   const getProgress = () => {
@@ -305,6 +308,28 @@ const InProgressView = () => {
           </div>
         </div>
       </div>
+
+      <AnimatePresence>
+        {showOverlay && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 1.2 }}
+            key={secondsLeft}
+            className="fixed inset-0 z-[100] flex items-center justify-center pointer-events-none"
+          >
+            <div
+              className="text-[#FF40C2] font-['USN_Stencil'] leading-none text-center select-none"
+              style={{
+                fontSize: isMobile ? '400px' : '600px',
+                textShadow: '0 0 40px rgba(255, 64, 194, 0.8), 0 0 80px rgba(255, 64, 194, 0.4)',
+              }}
+            >
+              {secondsLeft}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
