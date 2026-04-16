@@ -161,13 +161,13 @@ const AdminPage = () => {
             <div className="flex flex-col gap-1.5">
               <div className="flex gap-1">
                 <Button variant="outline" size="xs" className="w-10" onClick={() => updateBonusScore('A', 1)}>+1</Button>
-                <Button variant="outline" size="xs" className="w-10" onClick={() => updateBonusScore('A', 5)}>+5</Button>
-                <Button variant="outline" size="xs" className="w-10" onClick={() => updateBonusScore('A', 10)}>+10</Button>
+                <Button variant="outline" size="xs" className="w-10" onClick={() => updateBonusScore('A', 50)}>+50</Button>
+                <Button variant="outline" size="xs" className="w-10" onClick={() => updateBonusScore('A', 100)}>+100</Button>
               </div>
               <div className="flex gap-1">
                 <Button variant="outline" size="xs" className="w-10" onClick={() => updateBonusScore('A', -1)}>-1</Button>
-                <Button variant="outline" size="xs" className="w-10" onClick={() => updateBonusScore('A', -5)}>-5</Button>
-                <Button variant="outline" size="xs" className="w-10" onClick={() => updateBonusScore('A', -10)}>-10</Button>
+                <Button variant="outline" size="xs" className="w-10" onClick={() => updateBonusScore('A', -50)}>-50</Button>
+                <Button variant="outline" size="xs" className="w-10" onClick={() => updateBonusScore('A', -100)}>-100</Button>
               </div>
               <div className="flex gap-1 mt-1 border-t border-border/50 pt-1.5">
                 <Input
@@ -191,13 +191,13 @@ const AdminPage = () => {
             <div className="flex flex-col gap-1.5">
               <div className="flex gap-1">
                 <Button variant="outline" size="xs" className="w-10" onClick={() => updateBonusScore('B', 1)}>+1</Button>
-                <Button variant="outline" size="xs" className="w-10" onClick={() => updateBonusScore('B', 5)}>+5</Button>
-                <Button variant="outline" size="xs" className="w-10" onClick={() => updateBonusScore('B', 10)}>+10</Button>
+                <Button variant="outline" size="xs" className="w-10" onClick={() => updateBonusScore('B', 50)}>+50</Button>
+                <Button variant="outline" size="xs" className="w-10" onClick={() => updateBonusScore('B', 100)}>+100</Button>
               </div>
               <div className="flex gap-1">
                 <Button variant="outline" size="xs" className="w-10" onClick={() => updateBonusScore('B', -1)}>-1</Button>
-                <Button variant="outline" size="xs" className="w-10" onClick={() => updateBonusScore('B', -5)}>-5</Button>
-                <Button variant="outline" size="xs" className="w-10" onClick={() => updateBonusScore('B', -10)}>-10</Button>
+                <Button variant="outline" size="xs" className="w-10" onClick={() => updateBonusScore('B', -50)}>-50</Button>
+                <Button variant="outline" size="xs" className="w-10" onClick={() => updateBonusScore('B', -100)}>-100</Button>
               </div>
               <div className="flex gap-1 mt-1 border-t border-border/50 pt-1.5">
                 <Input
