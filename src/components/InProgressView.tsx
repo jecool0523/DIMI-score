@@ -76,16 +76,10 @@ const InProgressView = () => {
     const durationMs = cdDurationMin * 60 * 1000;
 
     // Determine the relevant start time for this countdown
-    let startTimestamp = current.setStartTime || current.actualStartTime;
+    // Only start if explicitly triggered by setStartTime in Admin
+    let startTimestamp = current.setStartTime;
 
-    if (!startTimestamp && current.time) {
-      const [h, m] = current.time.split(':').map(Number);
-      const scheduledStart = new Date(time);
-      scheduledStart.setHours(h, m, 0, 0);
-      startTimestamp = scheduledStart.getTime();
-    }
-
-    if (!startTimestamp) return durationMs;
+    if (!startTimestamp) return 0;
 
     const elapsedMs = time.getTime() - startTimestamp;
     return Math.max(0, durationMs - elapsedMs);
