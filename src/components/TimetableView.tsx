@@ -31,11 +31,6 @@ const TimetableView = () => {
 
   const handleClick = (e: React.MouseEvent, event: SportEvent) => {
     e.stopPropagation();
-    events.forEach(ev => {
-      if (ev.status === 'IN_PROGRESS' && ev.id !== event.id) {
-        setEventStatus(ev.id, 'COMPLETED');
-      }
-    });
     setEventStatus(event.id, 'IN_PROGRESS');
   };
 

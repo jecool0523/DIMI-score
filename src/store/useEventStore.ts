@@ -43,6 +43,7 @@ interface EventStore {
   resetSetTimer: (id: string) => void;
   resetToDefaultSchedule: () => Promise<void>;
   syncTimeOffset: () => Promise<void>;
+  lastLocalUpdate: number;
 }
 
 type AppStateRow = Tables<'app_state'>;
@@ -83,7 +84,7 @@ const storeRuntime: StoreRuntime =
     : (((window as EventStoreWindow).__eventStoreRuntime ??= createStoreRuntime()) as StoreRuntime);
 
 const defaultEvents: SportEvent[] = [
-  { id: '1', name: '개회식', time: '09:00', duration: 30, icon: 'Flag', status: 'UPCOMING', scoreA: 0, scoreB: 0 },
+  { id: '1', name: '개회식', time: '09:00', duration: 30, icon: 'Flag', status: 'IN_PROGRESS', scoreA: 0, scoreB: 0 },
   { id: '2', name: '사제 족구', time: '09:30', duration: 30, icon: 'Circle', status: 'UPCOMING', teamA: '청팀', teamB: '백팀', scoreA: 0, scoreB: 0 },
   { id: '3', name: '여자 피구', time: '10:05', duration: 30, icon: 'Users', status: 'UPCOMING', teamA: '청팀', teamB: '백팀', scoreA: 0, scoreB: 0 },
   { id: '4', name: '줄다리기', time: '10:35', duration: 25, icon: 'Grip', status: 'UPCOMING', teamA: '청팀', teamB: '백팀', scoreA: 0, scoreB: 0 },
@@ -150,6 +151,12 @@ const applyAppState = (appState: AppStateRow) => {
 };
 
 const applyEvents = (events: EventRow[]) => {
+  const lastUpdate = useEventStore.getState().lastLocalUpdate;
+  if (Date.now() - lastUpdate < 5000) {
+    console.log('⏳ Skipping events full sync to protect recent local update');
+    return;
+  }
+
   useEventStore.setState({
     events: events
       .map(mapEventRow)
@@ -352,7 +359,7 @@ const startRealtime = async () => {
 
   channel
     .on('postgres_changes', { event: '*', schema: 'public', table: 'app_state' }, (payload) => {
-      console.log('🔔 App state change received');
+      console.log('🔔 App state change received:', payload.new);
       if (payload.new) {
         applyAppState(payload.new as AppStateRow);
       } else {
@@ -362,9 +369,23 @@ const startRealtime = async () => {
     .on('postgres_changes', { event: '*', schema: 'public', table: 'events' }, (payload) => {
       console.log('🔔 Event change received');
       if (payload.new) {
+        const lastUpdate = useEventStore.getState().lastLocalUpdate;
+        if (Date.now() - lastUpdate < 5000) {
+          console.log('⏳ Skipping realtime event update to protect recent local update');
+          return;
+        }
+
         const updatedEvent = mapEventRow(payload.new as EventRow);
         useEventStore.setState((state) => ({
-          events: state.events.map((e) => (e.id === updatedEvent.id ? updatedEvent : e)),
+          events: state.events.map((e) => {
+            if (e.id === updatedEvent.id) return updatedEvent;
+            // If the arriving event is IN_PROGRESS, any other IN_PROGRESS should become COMPLETED
+            // to maintain exclusivity across multiple clients
+            if (updatedEvent.status === 'IN_PROGRESS' && e.status === 'IN_PROGRESS') {
+              return { ...e, status: 'COMPLETED' };
+            }
+            return e;
+          }),
         }));
       } else {
         void loadEvents();
@@ -411,6 +432,7 @@ export const useEventStore = create<EventStore>((set, get) => ({
   bonusScoreA: 0,
   bonusScoreB: 0,
   serverTimeOffset: 0,
+  lastLocalUpdate: 0,
 
   setViewMode: async (mode) => {
     set({ viewMode: mode });
@@ -428,7 +450,8 @@ export const useEventStore = create<EventStore>((set, get) => ({
   },
 
   setEventStatus: async (id, status) => {
-    const actualStartTime = status === 'IN_PROGRESS' ? Date.now() : undefined;
+    const timestamp = Date.now();
+    const actualStartTime = status === 'IN_PROGRESS' ? timestamp : undefined;
     const events = get().events;
     const currentIndex = events.findIndex(e => e.id === id);
     const nextEvent = events[currentIndex + 1];
@@ -444,6 +467,7 @@ export const useEventStore = create<EventStore>((set, get) => ({
         }
         return e;
       }),
+      lastLocalUpdate: timestamp,
     }));
 
     const { error } = await supabase.from('events').update({

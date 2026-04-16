@@ -347,6 +347,13 @@ const AdminPage = () => {
                   <div className="flex gap-2">
                     <Button
                       size="sm"
+                      variant={event.status === 'UPCOMING' ? 'default' : 'secondary'}
+                      onClick={() => setEventStatus(event.id, 'UPCOMING')}
+                    >
+                      진행 전
+                    </Button>
+                    <Button
+                      size="sm"
                       variant={event.status === 'IN_PROGRESS' ? 'default' : 'secondary'}
                       onClick={() => setEventStatus(event.id, 'IN_PROGRESS')}
                     >
