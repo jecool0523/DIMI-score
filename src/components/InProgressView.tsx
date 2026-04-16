@@ -128,11 +128,12 @@ const InProgressView = () => {
           <div className="relative w-[480px] h-[100px] flex items-center justify-center">
             {/* Left Arrow */}
             <motion.div
-              className="absolute left-0 w-[100px] h-[100px] rotate-0 pt-[10px]"
-              initial={{ opacity: 0, x: -50 }}
+              className="absolute left-0 w-[100px] h-[100px] pt-[10px]"
+              initial={{ opacity: 0, x: 20, rotate: -90 }}
               animate={{
                 opacity: [0, 1, 1, 0],
-                x: [-50, 0, 0, -20],
+                x: [20, 0, 0, 50],
+                rotate: -90,
               }}
               transition={{
                 duration: 4,
@@ -152,11 +153,12 @@ const InProgressView = () => {
 
             {/* Right Arrow */}
             <motion.div
-              className="absolute right-0 w-[100px] h-[100px] rotate-180 pt-[10px]"
-              initial={{ opacity: 0, x: 50 }}
+              className="absolute right-0 w-[100px] h-[100px] pt-[10px]"
+              initial={{ opacity: 0, x: -20, rotate: 90 }}
               animate={{
                 opacity: [0, 1, 1, 0],
-                x: [50, 0, 0, 20],
+                x: [-20, 0, 0, -50],
+                rotate: 90,
               }}
               transition={{
                 duration: 4,
@@ -179,9 +181,9 @@ const InProgressView = () => {
         </div>
 
         {/* Progress Bar on Divider Line */}
-        <div className="absolute top-[381px] left-0 w-[1920px] h-[30px] z-20">
+        <div className="absolute top-[386px] left-0 w-[1920px] h-[25px] z-20">
           <div
-            className="h-full bg-[#FF5297] shadow-[0_0_20px_rgba(255,82,151,0.6)] transition-all duration-1000 ease-linear"
+            className="h-full bg-[#FF5297] transition-all duration-1000 ease-linear"
             style={{ width: `${progressWidth}px` }}
           />
         </div>
