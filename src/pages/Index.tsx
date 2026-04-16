@@ -5,7 +5,7 @@ import InProgressView from '@/components/InProgressView';
 import PreparationView from '@/components/PreparationView';
 import TimetableView from '@/components/TimetableView';
 import AnnouncementOverlay from '@/components/AnnouncementOverlay';
-import { useEventStore } from '@/store/useEventStore';
+import { useEventStore, type ViewMode } from '@/store/useEventStore';
 import { Clock } from 'lucide-react';
 
 const DisplayPage = () => {
@@ -20,6 +20,18 @@ const DisplayPage = () => {
   const nextEvent = currentIdx >= 0 && currentIdx + 1 < events.length ? events[currentIdx + 1] : null;
 
   const [loadTime] = useState(Date.now());
+  const [effectiveViewMode, setEffectiveViewMode] = useState<ViewMode>(viewMode);
+
+  useEffect(() => {
+    // Only switch to IN_PROGRESS if there's actually a game
+    if (viewMode === 'IN_PROGRESS') {
+      if (currentEvent) {
+        setEffectiveViewMode('IN_PROGRESS');
+      }
+    } else {
+      setEffectiveViewMode(viewMode);
+    }
+  }, [viewMode, !!currentEvent]);
 
   useEffect(() => {
     // Only show if the announcement was triggered AFTER the page loaded
@@ -53,9 +65,9 @@ const DisplayPage = () => {
 
       {/* Main views */}
       <div className="flex-1 flex flex-col items-center justify-center w-full">
-        {viewMode === 'TIMETABLE' && <TimetableView />}
-        {viewMode === 'IN_PROGRESS' && <InProgressView />}
-        {viewMode === 'PREPARATION' && <PreparationView />}
+        {effectiveViewMode === 'TIMETABLE' && <TimetableView />}
+        {effectiveViewMode === 'IN_PROGRESS' && <InProgressView />}
+        {effectiveViewMode === 'PREPARATION' && <PreparationView />}
       </div>
 
       {/* Marquee Banner */}

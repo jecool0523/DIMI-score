@@ -141,6 +141,16 @@ const AdminPage = () => {
             </Button>
           ))}
         </div>
+
+        {viewMode === 'IN_PROGRESS' && !events.some(e => e.status === 'IN_PROGRESS') && (
+          <div className="mt-4 p-3 bg-amber-50 border border-amber-200 rounded-lg flex items-center gap-3 text-amber-800 max-w-3xl animate-in slide-in-from-top-2 duration-300">
+            <AlertTriangle className="text-amber-500 shrink-0" size={20} />
+            <div>
+              <p className="font-semibold text-sm">진행 중인 경기가 없습니다.</p>
+              <p className="text-xs opacity-90">메인 화면은 이전 상태(시간표 또는 준비 화면)를 유지합니다. 하단에서 종목의 상태를 '진행중'으로 변경해 주세요.</p>
+            </div>
+          </div>
+        )}
       </section>
 
       {/* Global Score control */}

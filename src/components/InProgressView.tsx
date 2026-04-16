@@ -57,13 +57,7 @@ const InProgressView = () => {
     prevScoreBRef.current = current?.scoreB;
   }, [current?.scoreB]);
 
-  if (!current) {
-    return (
-      <div className="fixed inset-0 z-40 bg-[#111] flex items-center justify-center animate-in fade-in duration-500">
-        <p className="font-sans text-5xl text-white">현재 진행 중인 종목이 없습니다</p>
-      </div>
-    );
-  }
+  if (!current) return null;
 
   const hours = time.getHours().toString().padStart(2, '0');
   const minutes = time.getMinutes().toString().padStart(2, '0');
