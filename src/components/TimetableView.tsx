@@ -101,7 +101,6 @@ const TimetableView = () => {
         <p className="absolute left-1/2 -translate-x-1/2 top-[580px] font-sans text-[395px] text-black leading-none tracking-[0.05em] m-0 whitespace-nowrap tabular-nums z-10 pointer-events-none shadow-none text-center">
           {hours}:{minutes}:{seconds}
         </p>
-
       </div>
     </div>
   );

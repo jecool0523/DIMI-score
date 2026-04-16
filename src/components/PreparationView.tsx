@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import { useEventStore } from '@/store/useEventStore';
 import TotalScoreBoard from './TotalScoreBoard';
 import { motion } from 'framer-motion';
-import MarqueeBanner from './MarqueeBanner';
 
 const PreparationView = () => {
   const events = useEventStore((s) => s.events);
@@ -114,10 +113,6 @@ const PreparationView = () => {
               <img src="/assets/match-arrow.svg" className="w-full h-full" alt="" />
             </motion.div>
           ))}
-        </div>
-
-        <div className="absolute bottom-0 left-0 w-full h-[80px]">
-          <MarqueeBanner />
         </div>
       </div>
     </div>

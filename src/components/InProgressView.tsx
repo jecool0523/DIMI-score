@@ -4,7 +4,6 @@ import confetti from 'canvas-confetti';
 import TotalScoreBoard from './TotalScoreBoard';
 import RouletteNumber from './RouletteNumber';
 import { motion, AnimatePresence } from 'framer-motion';
-import MarqueeBanner from './MarqueeBanner';
 
 const InProgressView = () => {
   const events = useEventStore((s) => s.events);
@@ -233,10 +232,6 @@ const InProgressView = () => {
               </span>
             </div>
           </div>
-        </div>
-
-        <div className="absolute bottom-0 left-0 w-full h-[80px]">
-          <MarqueeBanner />
         </div>
       </div>
 
