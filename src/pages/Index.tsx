@@ -18,16 +18,19 @@ const DisplayPage = () => {
 
   const effectiveViewMode = useMemo(() => {
     // 1. Check for any event currently IN_PROGRESS
-    // We use findLast (finding from the end of chronological array) to prioritize the latest active event
-    // if multiple events are temporarily marked IN_PROGRESS due to sync delays.
-    const currentEvent = [...events].reverse().find((e) => e.status === 'IN_PROGRESS');
+    // Prioritize sports events (with teamA) that are IN_PROGRESS over ceremony events
+    const inProgressEvents = events.filter((e) => e.status === 'IN_PROGRESS');
+
+    // First: look for a sports event (has teamA) that is IN_PROGRESS
+    const sportsEvent = inProgressEvents.find((e) => e.teamA && e.teamA.trim() !== '');
+    // Fallback: any IN_PROGRESS event (ceremony, performance, etc.)
+    const currentEvent = sportsEvent ?? (inProgressEvents.length > 0 ? inProgressEvents[inProgressEvents.length - 1] : undefined);
 
     let mode: ViewMode = 'TIMETABLE';
 
     if (currentEvent) {
       // If it's a sports event (has teamA/B), show InProgress scoreboard
       // Otherwise (Ceremony, Performance, etc.), show Timetable
-      // Using .trim() to handle empty strings if they exist
       if (currentEvent.teamA && currentEvent.teamA.trim() !== '') {
         mode = 'IN_PROGRESS';
       } else {
@@ -46,7 +49,7 @@ const DisplayPage = () => {
       }
     }
 
-    console.log(`[ViewMode] Logical state updated: ${mode}${currentEvent ? ` (Current: ${currentEvent.name})` : ' (No active event)'}`);
+    console.log(`[ViewMode] Logical state updated: ${mode}${currentEvent ? ` (Current: ${currentEvent.name})` : ' (No active event)'}, IN_PROGRESS events: [${inProgressEvents.map(e => e.name).join(', ')}]`);
     return mode;
   }, [events]);
 

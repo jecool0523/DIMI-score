@@ -84,7 +84,7 @@ const storeRuntime: StoreRuntime =
     : (((window as EventStoreWindow).__eventStoreRuntime ??= createStoreRuntime()) as StoreRuntime);
 
 const defaultEvents: SportEvent[] = [
-  { id: '1', name: '개회식', time: '09:00', duration: 30, icon: 'Flag', status: 'IN_PROGRESS', scoreA: 0, scoreB: 0 },
+  { id: '1', name: '개회식', time: '09:00', duration: 30, icon: 'Flag', status: 'UPCOMING', scoreA: 0, scoreB: 0 },
   { id: '2', name: '사제 족구', time: '09:30', duration: 30, icon: 'Circle', status: 'UPCOMING', teamA: '청팀', teamB: '백팀', scoreA: 0, scoreB: 0 },
   { id: '3', name: '여자 피구', time: '10:05', duration: 30, icon: 'Users', status: 'UPCOMING', teamA: '청팀', teamB: '백팀', scoreA: 0, scoreB: 0 },
   { id: '4', name: '줄다리기', time: '10:35', duration: 25, icon: 'Grip', status: 'UPCOMING', teamA: '청팀', teamB: '백팀', scoreA: 0, scoreB: 0 },
@@ -152,7 +152,7 @@ const applyAppState = (appState: AppStateRow) => {
 
 const applyEvents = (events: EventRow[]) => {
   const lastUpdate = useEventStore.getState().lastLocalUpdate;
-  if (Date.now() - lastUpdate < 5000) {
+  if (Date.now() - lastUpdate < 3000) {
     console.log('⏳ Skipping events full sync to protect recent local update');
     return;
   }
@@ -367,10 +367,10 @@ const startRealtime = async () => {
       }
     })
     .on('postgres_changes', { event: '*', schema: 'public', table: 'events' }, (payload) => {
-      console.log('🔔 Event change received');
+      console.log('🔔 Event change received:', (payload.new as any)?.id, (payload.new as any)?.status);
       if (payload.new) {
         const lastUpdate = useEventStore.getState().lastLocalUpdate;
-        if (Date.now() - lastUpdate < 5000) {
+        if (Date.now() - lastUpdate < 3000) {
           console.log('⏳ Skipping realtime event update to protect recent local update');
           return;
         }
@@ -452,9 +452,9 @@ export const useEventStore = create<EventStore>((set, get) => ({
   setEventStatus: async (id, status) => {
     const timestamp = Date.now();
     const actualStartTime = status === 'IN_PROGRESS' ? timestamp : undefined;
-    const events = get().events;
-    const currentIndex = events.findIndex(e => e.id === id);
-    const nextEvent = events[currentIndex + 1];
+
+    // Snapshot previous state for rollback
+    const previousEvents = get().events;
 
     // Optimistic update: Ensure only one event is IN_PROGRESS
     set((state) => ({
@@ -470,18 +470,31 @@ export const useEventStore = create<EventStore>((set, get) => ({
       lastLocalUpdate: timestamp,
     }));
 
+    console.log(`🔄 setEventStatus: id=${id}, status=${status}`);
+
     const { error } = await supabase.from('events').update({
       status,
       actual_start_time: actualStartTime
     }).eq('id', id);
+
     if (error) {
-      console.error('Error setting event status:', error);
-    } else if (status === 'IN_PROGRESS') {
+      console.error('❌ setEventStatus DB update failed, rolling back:', error);
+      // Rollback optimistic update
+      set({ events: previousEvents, lastLocalUpdate: 0 });
+      return;
+    }
+
+    console.log(`✅ setEventStatus DB update succeeded: id=${id}, status=${status}`);
+
+    if (status === 'IN_PROGRESS') {
       // Also update others to COMPLETED in DB to maintain exclusivity
-      await supabase.from('events')
+      const { error: bulkError } = await supabase.from('events')
         .update({ status: 'COMPLETED' })
         .neq('id', id)
         .eq('status', 'IN_PROGRESS');
+      if (bulkError) {
+        console.error('❌ setEventStatus bulk-complete update failed:', bulkError);
+      }
     }
   },
 
