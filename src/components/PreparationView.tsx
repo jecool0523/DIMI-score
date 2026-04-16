@@ -53,9 +53,9 @@ const PreparationView = () => {
         {/* Content Box (Right Top) */}
         <div className="absolute top-[120px] left-[917px] w-[1003px] h-[535px]">
           {/* Blackout rect hiding baked-in SVG clock numbers ensuring clean dynamic text rendering */}
-          <div className="absolute right-[0px] top-[60px] w-[400px] h-[440px] bg-white z-0" />
+          <div className="absolute right-[0px] top-[60px] w-[400px] h-[440px] z-0" />
 
-          <div className="absolute font-sans leading-[1] right-[128.3px] text-[#ff40c2] text-[171.6px] text-right top-[80px] m-0 flex flex-col tracking-widest tabular-nums gap-0 z-10">
+          <div className="absolute font-sans leading-[1] right-[128.3px] text-[#ff40c2] text-[170px] text-right top-[5px] m-0 flex flex-col tracking-normal tabular-nums gap-0 z-10">
             <span>{hours}</span>
             <span>{minutes}</span>
             <span>{seconds}</span>
