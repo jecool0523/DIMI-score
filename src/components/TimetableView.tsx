@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useEventStore, type SportEvent } from '@/store/useEventStore';
 import TotalScoreBoard from './TotalScoreBoard';
+import { motion } from 'framer-motion';
 
 const TimetableView = () => {
   const events = useEventStore((s) => s.events);
@@ -78,8 +79,31 @@ const TimetableView = () => {
                 <div
                   key={event.id}
                   onClick={(e) => handleClick(e, event)}
-                  className={`relative flex-[1_1_100%] cursor-pointer transition-transform active:scale-95 flex flex-col items-center pt-[50.7px] overflow-hidden`}
+                  className={`relative flex-[1_1_100%] cursor-pointer transition-transform active:scale-95 flex flex-col items-center pt-[50.7px]`}
                 >
+                  {index === 1 && (
+                    <motion.div
+                      initial={{ opacity: 1, y: -20, x: -140, rotate: 90 }}
+                      animate={{
+                        x: -110,
+                        y: -20,
+                      }}
+                      transition={{
+                        duration: 0.8,
+                        repeat: Infinity,
+                        repeatType: "reverse",
+                        ease: "easeInOut"
+                      }}
+                      className="w-[70px] h-[70px] absolute z-20"
+                    >
+                      <img
+                        src="/assets/match-arrow.svg"
+                        className="w-full h-full"
+                        style={{ filter: 'brightness(0) invert(1)' }}
+                        alt=""
+                      />
+                    </motion.div>
+                  )}
                 </div>
               );
             });
