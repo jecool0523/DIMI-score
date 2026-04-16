@@ -129,10 +129,10 @@ const InProgressView = () => {
             {/* Left Arrow */}
             <motion.div
               className="absolute left-0 w-[100px] h-[100px] pt-[10px]"
-              initial={{ opacity: 0, x: 20, rotate: -90 }}
+              initial={{ opacity: 0, x: 60, rotate: -90 }}
               animate={{
                 opacity: [0, 1, 1, 0],
-                x: [20, 0, 0, 50],
+                x: [60, 0, 0, -60],
                 rotate: -90,
               }}
               transition={{
@@ -154,10 +154,10 @@ const InProgressView = () => {
             {/* Right Arrow */}
             <motion.div
               className="absolute right-0 w-[100px] h-[100px] pt-[10px]"
-              initial={{ opacity: 0, x: -20, rotate: 90 }}
+              initial={{ opacity: 0, x: -60, rotate: 90 }}
               animate={{
                 opacity: [0, 1, 1, 0],
-                x: [-20, 0, 0, -50],
+                x: [-60, 0, 0, 60],
                 rotate: 90,
               }}
               transition={{
