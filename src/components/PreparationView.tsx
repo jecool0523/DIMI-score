@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useEventStore } from '@/store/useEventStore';
 import TotalScoreBoard from './TotalScoreBoard';
+import { motion } from 'framer-motion';
 
 const PreparationView = () => {
   const events = useEventStore((s) => s.events);
@@ -33,6 +34,8 @@ const PreparationView = () => {
     );
   }
 
+  const arrowTransitions = [0, 0.4, 0.8];
+
   return (
     <div className="fixed inset-0 z-40 bg-[#F4F4F4] overflow-hidden flex items-start justify-center animate-in fade-in duration-500">
       <div
@@ -63,7 +66,30 @@ const PreparationView = () => {
         </div>
 
         {/* Content Box (Left Bottom) */}
-        <div className="absolute top-[656px] left-0 w-[1046px] h-[325px] overflow-hidden" />
+        <div className="absolute top-[656px] left-0 w-[1046px] h-[325px] flex items-center gap-[100px] px-[150px]">
+          {arrowTransitions.map((delay, i) => (
+            <motion.div
+              key={i}
+              className="w-[175px] h-[175px]"
+              initial={{ opacity: 0, x: -60, rotate: 90 }}
+              animate={{
+                opacity: [0, 1, 1, 0],
+                x: [-60, 0, 0, 60],
+                rotate: 90,
+              }}
+              transition={{
+                duration: 3,
+                times: [0, 0.1, 0.8, 1],
+                ease: ["easeOut", "linear", "easeIn"],
+                repeat: Infinity,
+                repeatDelay: 3,
+                delay: delay
+              }}
+            >
+              <img src="/assets/match-arrow.svg" className="w-full h-full" alt="" />
+            </motion.div>
+          ))}
+        </div>
 
         {/* Content Box (Right Bottom) */}
         <div className="absolute top-[656px] left-[1047px] w-[873px] h-[325px] overflow-hidden" />
