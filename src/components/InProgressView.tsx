@@ -74,42 +74,26 @@ const InProgressView = () => {
   const getRemainingTimeMs = () => {
     if (!current) return 0;
 
-    // Use setDuration and setStartTime if available
-    if (current.setDuration && current.setStartTime) {
-      const durationMs = current.setDuration * 60 * 1000;
-      const elapsedMs = time.getTime() - current.setStartTime;
-      return Math.max(0, durationMs - elapsedMs);
-    }
+    // Use setDuration (default to 15m)
+    const cdDurationMin = current.setDuration || 15;
+    const durationMs = cdDurationMin * 60 * 1000;
 
-    // Fallback: Use duration and actualStartTime (overall match timer)
-    const currentIndex = events.findIndex(e => e.id === current.id);
-    const nextEvent = events[currentIndex + 1];
-    let durationInMinutes = 40;
+    // Determine the relevant start time for this countdown
+    // 1. setStartTime (explicit reset)
+    // 2. actualStartTime (game started)
+    // 3. scheduled time (fallback)
+    let startTimestamp = current.setStartTime || current.actualStartTime;
 
-    if (current.duration) {
-      durationInMinutes = current.duration;
-    } else if (nextEvent) {
-      const getMinutes = (t: string) => {
-        const [h, m] = t.split(':').map(Number);
-        return h * 60 + m;
-      };
-      durationInMinutes = getMinutes(nextEvent.time) - getMinutes(current.time);
-      if (durationInMinutes <= 0) durationInMinutes = 40;
-    }
-
-    const durationMs = durationInMinutes * 60 * 1000;
-    let elapsedMs = 0;
-
-    if (current.actualStartTime) {
-      elapsedMs = time.getTime() - current.actualStartTime;
-    } else if (current.time) {
-      // Fallback to scheduled time if no actual start time
+    if (!startTimestamp && current.time) {
       const [h, m] = current.time.split(':').map(Number);
       const scheduledStart = new Date(time);
       scheduledStart.setHours(h, m, 0, 0);
-      elapsedMs = time.getTime() - scheduledStart.getTime();
+      startTimestamp = scheduledStart.getTime();
     }
 
+    if (!startTimestamp) return durationMs;
+
+    const elapsedMs = time.getTime() - startTimestamp;
     return Math.max(0, durationMs - elapsedMs);
   };
 
