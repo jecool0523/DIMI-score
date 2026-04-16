@@ -32,7 +32,7 @@ const AdminPage = () => {
     }
   };
 
-  const { viewMode, setViewMode, events, setEventStatus, updateScore, resetScore, setAnnouncement, bonusScoreA, bonusScoreB, updateBonusScore, resetBonusScore, triggerAnnouncement, updateEventDuration } = useEventStore();
+  const { viewMode, setViewMode, events, setEventStatus, updateScore, resetScore, setAnnouncement, bonusScoreA, bonusScoreB, updateBonusScore, resetBonusScore, triggerAnnouncement, updateEventDuration, resetToDefaultSchedule } = useEventStore();
   const [announcementInput, setAnnouncementInput] = useState('');
   const [manualBonusA, setManualBonusA] = useState('');
   const [manualBonusB, setManualBonusB] = useState('');
@@ -257,9 +257,23 @@ const AdminPage = () => {
         </div>
       </section>
 
-      {/* Events control */}
       <section>
-        <h2 className="text-xl font-semibold text-muted-foreground mb-3">종목 관리</h2>
+        <div className="flex items-center justify-between mb-3 max-w-3xl">
+          <h2 className="text-xl font-semibold text-muted-foreground">종목 관리</h2>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={async () => {
+              if (confirm('모든 종목 데이터를 초기화하고 기본 시간표로 덮어씌우시겠습니까? 이 작업은 되돌릴 수 없습니다.')) {
+                await resetToDefaultSchedule();
+                toast.success('기본 시간표로 초기화되었습니다.');
+              }
+            }}
+            className="gap-1 h-8 text-amber-600 border-amber-200 hover:bg-amber-50"
+          >
+            <RotateCcw size={14} /> 기본 시간표로 초기화
+          </Button>
+        </div>
         <div className="space-y-3 max-w-3xl">
           {events.map((event) => (
             <div key={event.id} className="bg-card rounded-lg p-4 border border-border">

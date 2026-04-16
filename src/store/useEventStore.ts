@@ -36,6 +36,7 @@ interface EventStore {
   resetBonusScore: () => void;
   triggerAnnouncement: () => void;
   updateEventDuration: (id: string, duration: number) => void;
+  resetToDefaultSchedule: () => Promise<void>;
 }
 
 type AppStateRow = Tables<'app_state'>;
@@ -76,14 +77,19 @@ const storeRuntime: StoreRuntime =
     : (((window as EventStoreWindow).__eventStoreRuntime ??= createStoreRuntime()) as StoreRuntime);
 
 const defaultEvents: SportEvent[] = [
-  { id: '1', name: '개회식', time: '09:00', icon: 'Flag', status: 'COMPLETED', scoreA: 0, scoreB: 0 },
-  { id: '2', name: '사제족구', time: '09:30', icon: 'Circle', status: 'COMPLETED', teamA: '1학년', teamB: '2학년', scoreA: 3, scoreB: 2 },
-  { id: '3', name: '농구', time: '10:00', icon: 'CircleDot', status: 'IN_PROGRESS', teamA: '청팀', teamB: '백팀', scoreA: 24, scoreB: 18 },
-  { id: '4', name: '줄다리기', time: '10:40', icon: 'Grip', status: 'UPCOMING', teamA: '청팀', teamB: '백팀', scoreA: 0, scoreB: 0 },
-  { id: '5', name: '축구', time: '11:20', icon: 'Target', status: 'UPCOMING', teamA: '청팀', teamB: '백팀', scoreA: 0, scoreB: 0 },
-  { id: '6', name: '점심시간', time: '12:00', icon: 'UtensilsCrossed', status: 'UPCOMING', scoreA: 0, scoreB: 0 },
-  { id: '7', name: '이어달리기', time: '13:00', icon: 'Zap', status: 'UPCOMING', teamA: '청팀', teamB: '백팀', scoreA: 0, scoreB: 0 },
-  { id: '8', name: '폐회식', time: '14:00', icon: 'Trophy', status: 'UPCOMING', scoreA: 0, scoreB: 0 },
+  { id: '1', name: '개회식', time: '09:00', duration: 30, icon: 'Flag', status: 'UPCOMING', scoreA: 0, scoreB: 0 },
+  { id: '2', name: '사제 족구', time: '09:30', duration: 30, icon: 'Circle', status: 'UPCOMING', teamA: '청팀', teamB: '백팀', scoreA: 0, scoreB: 0 },
+  { id: '3', name: '여자 피구', time: '10:05', duration: 30, icon: 'Users', status: 'UPCOMING', teamA: '청팀', teamB: '백팀', scoreA: 0, scoreB: 0 },
+  { id: '4', name: '줄다리기', time: '10:35', duration: 25, icon: 'Grip', status: 'UPCOMING', teamA: '청팀', teamB: '백팀', scoreA: 0, scoreB: 0 },
+  { id: '5', name: 'US 공연', time: '11:05', duration: 15, icon: 'Music', status: 'UPCOMING', scoreA: 0, scoreB: 0 },
+  { id: '6', name: '농구', time: '11:30', duration: 50, icon: 'CircleDot', status: 'UPCOMING', teamA: '청팀', teamB: '백팀', scoreA: 0, scoreB: 0 },
+  { id: '7', name: 'O/X 퀴즈', time: '12:25', duration: 15, icon: 'HelpCircle', status: 'UPCOMING', scoreA: 0, scoreB: 0 },
+  { id: '8', name: '점심 식사', time: '12:50', duration: 60, icon: 'UtensilsCrossed', status: 'UPCOMING', scoreA: 0, scoreB: 0 },
+  { id: '9', name: '종목 릴레이', time: '14:00', duration: 30, icon: 'Activity', status: 'UPCOMING', teamA: '청팀', teamB: '백팀', scoreA: 0, scoreB: 0 },
+  { id: '10', name: '사제 축구', time: '14:35', duration: 25, icon: 'Target', status: 'UPCOMING', teamA: '청팀', teamB: '백팀', scoreA: 0, scoreB: 0 },
+  { id: '11', name: '노래 자랑', time: '15:35', duration: 5, icon: 'Mic2', status: 'UPCOMING', scoreA: 0, scoreB: 0 },
+  { id: '12', name: '계주', time: '15:50', duration: 25, icon: 'Zap', status: 'UPCOMING', teamA: '청팀', teamB: '백팀', scoreA: 0, scoreB: 0 },
+  { id: '13', name: '폐회식', time: '16:15', duration: 10, icon: 'Trophy', status: 'UPCOMING', scoreA: 0, scoreB: 0 },
 ];
 
 const defaultAppState: AppStateRow = {
@@ -106,7 +112,8 @@ const defaultEventRows: EventRow[] = defaultEvents.map((event) => ({
   score_a: event.scoreA,
   score_b: event.scoreB,
   actual_start_time: event.actualStartTime ?? null,
-}));
+  duration: event.duration,
+} as any));
 
 const mapEventRow = (event: EventRow): SportEvent => ({
   id: event.id,
@@ -475,6 +482,26 @@ export const useEventStore = create<EventStore>((set, get) => ({
     }));
     const { error } = await supabase.from('events').update({ duration } as any).eq('id', id);
     if (error) console.error('Error updating duration:', error);
+  },
+  resetToDefaultSchedule: async () => {
+    // 1. Delete all existing events
+    const { error: deleteError } = await supabase.from('events').delete().neq('id', '0'); // Delete all
+    if (deleteError) {
+      console.error('Error deleting events:', deleteError);
+      return;
+    }
+
+    // 2. Insert default events
+    const { data, error: insertError } = await supabase.from('events').insert(defaultEventRows).select('*');
+    if (insertError) {
+      console.error('Error inserting default events:', insertError);
+      return;
+    }
+
+    // 3. Update local state
+    if (data) {
+      applyEvents(data);
+    }
   },
 }));
 
