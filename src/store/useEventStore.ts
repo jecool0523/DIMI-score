@@ -157,9 +157,24 @@ const applyEvents = (events: EventRow[]) => {
     return;
   }
 
+  // Preserve local-only timer state (not persisted in DB)
+  const currentEvents = useEventStore.getState().events;
+
   useEventStore.setState({
     events: events
-      .map(mapEventRow)
+      .map((row) => {
+        const mapped = mapEventRow(row);
+        const existing = currentEvents.find((e) => e.id === mapped.id);
+        if (existing) {
+          return {
+            ...mapped,
+            duration: mapped.duration ?? existing.duration,
+            setDuration: mapped.setDuration ?? existing.setDuration,
+            setStartTime: mapped.setStartTime ?? existing.setStartTime,
+          };
+        }
+        return mapped;
+      })
       .sort((a, b) => a.time.localeCompare(b.time)),
   });
 };
@@ -380,6 +395,13 @@ const startRealtime = async () => {
         }
 
         const updatedEvent = mapEventRow(payload.new as EventRow);
+        // Preserve local-only timer state that isn't stored in DB
+        const existing = useEventStore.getState().events.find((e) => e.id === updatedEvent.id);
+        if (existing) {
+          updatedEvent.duration = updatedEvent.duration ?? existing.duration;
+          updatedEvent.setDuration = updatedEvent.setDuration ?? existing.setDuration;
+          updatedEvent.setStartTime = updatedEvent.setStartTime ?? existing.setStartTime;
+        }
         useEventStore.setState((state) => ({
           events: state.events.map((e) => {
             if (e.id === updatedEvent.id) return updatedEvent;
