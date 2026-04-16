@@ -357,7 +357,7 @@ const startRealtime = async () => {
   await resetRealtimeChannel();
 
   console.log('📡 Setting up realtime listeners...');
-  const channel = supabase.channel(`db-changes-${Date.now()}`);
+  const channel = supabase.channel('dimi-score-sync');
   storeRuntime.realtimeChannel = channel;
   storeRuntime.realtimeStatus = 'CONNECTING';
 
@@ -394,6 +394,26 @@ const startRealtime = async () => {
       } else {
         void loadEvents();
       }
+    })
+    // Timer sync via Realtime Broadcast (no DB columns needed)
+    .on('broadcast', { event: 'timer-update' }, (payload) => {
+      const { eventId, setStartTime, setDuration } = payload.payload as {
+        eventId: string;
+        setStartTime?: number;
+        setDuration?: number;
+      };
+      console.log('⏱️ Timer broadcast received:', eventId, { setStartTime, setDuration });
+      useEventStore.setState((state) => ({
+        events: state.events.map((e) =>
+          e.id === eventId
+            ? {
+              ...e,
+              ...(setStartTime !== undefined && { setStartTime }),
+              ...(setDuration !== undefined && { setDuration }),
+            }
+            : e
+        ),
+      }));
     })
     .subscribe((status) => {
       if (storeRuntime.realtimeChannel !== channel) {
@@ -573,13 +593,13 @@ export const useEventStore = create<EventStore>((set, get) => ({
     set((state) => ({
       events: state.events.map((e) => (e.id === id ? { ...e, setDuration: set_duration } : e)),
     }));
-    const { error } = await supabase.from('events').update({ set_duration }).eq('id', id);
-    if (error) {
-      if (error.code === 'PGRST204') {
-        console.warn('⚠️ set_duration column missing in DB — timer is local-only. Run migration SQL.');
-      } else {
-        console.error('Error updating set duration:', error);
-      }
+    // Sync via Realtime Broadcast (no DB column required)
+    if (storeRuntime.realtimeChannel && storeRuntime.realtimeStatus === 'SUBSCRIBED') {
+      await storeRuntime.realtimeChannel.send({
+        type: 'broadcast',
+        event: 'timer-update',
+        payload: { eventId: id, setDuration: set_duration },
+      });
     }
   },
   resetSetTimer: async (id) => {
@@ -587,13 +607,17 @@ export const useEventStore = create<EventStore>((set, get) => ({
     set((state) => ({
       events: state.events.map((e) => (e.id === id ? { ...e, setStartTime: timestamp } : e)),
     }));
-    const { error } = await supabase.from('events').update({ set_start_time: timestamp }).eq('id', id);
-    if (error) {
-      if (error.code === 'PGRST204') {
-        console.warn('⚠️ set_start_time column missing in DB — timer is local-only. Run migration SQL.');
-      } else {
-        console.error('Error resetting set timer:', error);
-      }
+    // Sync via Realtime Broadcast (no DB column required)
+    if (storeRuntime.realtimeChannel && storeRuntime.realtimeStatus === 'SUBSCRIBED') {
+      const currentSetDuration = get().events.find(e => e.id === id)?.setDuration;
+      await storeRuntime.realtimeChannel.send({
+        type: 'broadcast',
+        event: 'timer-update',
+        payload: { eventId: id, setStartTime: timestamp, setDuration: currentSetDuration },
+      });
+      console.log('⏱️ Timer broadcast sent:', id, timestamp);
+    } else {
+      console.warn('⚠️ Realtime not connected — timer is local-only.');
     }
   },
   resetToDefaultSchedule: async () => {
