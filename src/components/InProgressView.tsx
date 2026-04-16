@@ -76,9 +76,41 @@ const InProgressView = () => {
     );
   }
 
-  const hours = time.getHours().toString().padStart(2, '0');
-  const minutes = time.getMinutes().toString().padStart(2, '0');
-  const seconds = time.getSeconds().toString().padStart(2, '0');
+  // Countdown Calculation
+  const getRemainingTimeMs = () => {
+    if (!current) return 0;
+    const currentIndex = events.findIndex(e => e.id === current.id);
+    const nextEvent = events[currentIndex + 1];
+    let durationInMinutes = 40;
+
+    if (nextEvent) {
+      const getMinutes = (t: string) => {
+        const [h, m] = t.split(':').map(Number);
+        return h * 60 + m;
+      };
+      durationInMinutes = getMinutes(nextEvent.time) - getMinutes(current.time);
+      if (durationInMinutes <= 0) durationInMinutes = 40;
+    }
+
+    const durationMs = durationInMinutes * 60 * 1000;
+    let elapsedMs = 0;
+
+    if (current.actualStartTime) {
+      elapsedMs = time.getTime() - current.actualStartTime;
+    } else {
+      const now = time;
+      const [h, m] = current.time.split(':').map(Number);
+      const scheduledDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), h, m, 0);
+      elapsedMs = now.getTime() - scheduledDate.getTime();
+    }
+
+    return Math.max(durationMs - elapsedMs, 0);
+  };
+
+  const remainingMs = getRemainingTimeMs();
+  const totalSeconds = Math.floor(remainingMs / 1000);
+  const remMinutes = Math.floor(totalSeconds / 60).toString().padStart(2, '0');
+  const remSeconds = (totalSeconds % 60).toString().padStart(2, '0');
 
   // Progress Calculation
   const getProgress = () => {
@@ -97,9 +129,9 @@ const InProgressView = () => {
     const durationMs = durationInMinutes * 60 * 1000;
     let elapsedMs = 0;
     if (current.actualStartTime) {
-      elapsedMs = Date.now() - current.actualStartTime;
+      elapsedMs = time.getTime() - current.actualStartTime;
     } else {
-      const now = new Date();
+      const now = time;
       const [h, m] = current.time.split(':').map(Number);
       const scheduledDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), h, m, 0);
       elapsedMs = now.getTime() - scheduledDate.getTime();
@@ -128,7 +160,7 @@ const InProgressView = () => {
           <div className="text-center space-y-2">
             <h2 className="text-5xl font-black text-black tracking-tight">{current.name}</h2>
             <div className="text-3xl font-medium text-gray-600 tabular-nums">
-              {hours}:{minutes}:{seconds}
+              {remMinutes}:{remSeconds}
             </div>
           </div>
 
@@ -245,7 +277,7 @@ const InProgressView = () => {
 
           <div className="flex-1 flex justify-center">
             <div className="font-sans text-[152.68px] text-black whitespace-nowrap m-0 tabular-nums font-[400] leading-none text-center">
-              {hours}:{minutes}:{seconds}
+              {remMinutes}:{remSeconds}
             </div>
           </div>
         </div>
