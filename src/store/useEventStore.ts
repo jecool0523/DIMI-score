@@ -110,7 +110,8 @@ const defaultAppState: AppStateRow = {
   bonus_score_b: 0,
 };
 
-const defaultEventRows: EventRow[] = defaultEvents.map((event) => ({
+// Only include columns that exist in the DB schema (duration/set_duration/set_start_time are local-only)
+const defaultEventRows = defaultEvents.map((event) => ({
   id: event.id,
   name: event.name,
   time: event.time,
@@ -121,8 +122,7 @@ const defaultEventRows: EventRow[] = defaultEvents.map((event) => ({
   score_a: event.scoreA,
   score_b: event.scoreB,
   actual_start_time: event.actualStartTime ?? null,
-  duration: event.duration,
-} as any));
+}));
 
 const mapEventRow = (event: EventRow): SportEvent => ({
   id: event.id,
@@ -244,7 +244,11 @@ const loadEvents = async () => {
     return;
   }
 
-  applyEvents(inserted ?? defaultEventRows);
+  if (inserted) {
+    applyEvents(inserted as EventRow[]);
+  } else {
+    useEventStore.setState({ events: defaultEvents });
+  }
 };
 
 const syncFromDatabase = async (reason: string) => {
@@ -553,26 +557,23 @@ export const useEventStore = create<EventStore>((set, get) => ({
     if (error) console.error('Error triggering announcement:', error);
   },
   updateEventDuration: async (id, duration) => {
+    // duration is stored locally only (not in DB schema)
     set((state) => ({
       events: state.events.map((e) => (e.id === id ? { ...e, duration } : e)),
     }));
-    const { error } = await supabase.from('events').update({ duration } as any).eq('id', id);
-    if (error) console.error('Error updating duration:', error);
   },
   updateEventSetDuration: async (id, set_duration) => {
+    // set_duration is stored locally only (not in DB schema)
     set((state) => ({
       events: state.events.map((e) => (e.id === id ? { ...e, setDuration: set_duration } : e)),
     }));
-    const { error } = await supabase.from('events').update({ set_duration } as any).eq('id', id);
-    if (error) console.error('Error updating set duration:', error);
   },
   resetSetTimer: async (id) => {
+    // set_start_time is stored locally only (not in DB schema)
     const timestamp = Date.now() + get().serverTimeOffset;
     set((state) => ({
       events: state.events.map((e) => (e.id === id ? { ...e, setStartTime: timestamp } : e)),
     }));
-    const { error } = await supabase.from('events').update({ set_start_time: timestamp } as any).eq('id', id);
-    if (error) console.error('Error resetting set timer:', error);
   },
   resetToDefaultSchedule: async () => {
     // 1. Delete all existing events
