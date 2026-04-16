@@ -417,6 +417,9 @@ export const useEventStore = create<EventStore>((set, get) => ({
 
   setEventStatus: async (id, status) => {
     const actualStartTime = status === 'IN_PROGRESS' ? Date.now() : undefined;
+    const events = get().events;
+    const currentIndex = events.findIndex(e => e.id === id);
+    const nextEvent = events[currentIndex + 1];
 
     // Optimistic update
     set((state) => ({
@@ -424,6 +427,17 @@ export const useEventStore = create<EventStore>((set, get) => ({
         e.id === id ? { ...e, status, actualStartTime: actualStartTime ?? e.actualStartTime } : e
       ),
     }));
+
+    // Automatic view mode switching
+    if (status === 'IN_PROGRESS') {
+      get().setViewMode('IN_PROGRESS');
+    } else if (status === 'COMPLETED') {
+      if (nextEvent) {
+        get().setViewMode('PREPARATION');
+      } else {
+        get().setViewMode('TIMETABLE');
+      }
+    }
 
     const { error } = await supabase.from('events').update({
       status,
