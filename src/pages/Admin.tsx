@@ -34,6 +34,39 @@ const AdminPage = () => {
 
   const { viewMode, setViewMode, events, setEventStatus, updateScore, resetScore, setAnnouncement, bonusScoreA, bonusScoreB, updateBonusScore, resetBonusScore, triggerAnnouncement } = useEventStore();
   const [announcementInput, setAnnouncementInput] = useState('');
+  const [manualBonusA, setManualBonusA] = useState('');
+  const [manualBonusB, setManualBonusB] = useState('');
+  const [eventManualInputs, setEventManualInputs] = useState<Record<string, { A: string; B: string }>>({});
+
+  const handleEventManualInputChange = (eventId: string, team: 'A' | 'B', value: string) => {
+    setEventManualInputs(prev => ({
+      ...prev,
+      [eventId]: {
+        ...(prev[eventId] || { A: '', B: '' }),
+        [team]: value
+      }
+    }));
+  };
+
+  const handleAddManualBonus = (team: 'A' | 'B') => {
+    const val = parseInt(team === 'A' ? manualBonusA : manualBonusB);
+    if (!isNaN(val)) {
+      updateBonusScore(team, val);
+      if (team === 'A') setManualBonusA('');
+      else setManualBonusB('');
+      toast.success(`${team === 'A' ? '청팀' : '백팀'}에 ${val}점이 추가되었습니다.`);
+    }
+  };
+
+  const handleAddManualEventScore = (id: string, team: 'A' | 'B') => {
+    const val = parseInt(eventManualInputs[id]?.[team] || '');
+    if (!isNaN(val)) {
+      updateScore(id, team, val);
+      handleEventManualInputChange(id, team, '');
+      const eventName = events.find(e => e.id === id)?.name || '경기';
+      toast.success(`${eventName} ${team === 'A' ? 'A팀' : 'B팀'}에 ${val}점이 추가되었습니다.`);
+    }
+  };
 
   const handleSendAnnouncement = () => {
     if (announcementInput.trim()) {
@@ -125,9 +158,28 @@ const AdminPage = () => {
               <p className="font-['Pretendard'] text-6xl text-primary mt-2 leading-none">{calculatedTotalA}</p>
               <p className="text-[11px] text-muted-foreground/60 mt-3 font-medium">수동 보너스: <span className="text-primary">{bonusScoreA > 0 ? `+${bonusScoreA}` : bonusScoreA}</span></p>
             </div>
-            <div className="flex flex-col gap-2">
-              <Button variant="outline" size="icon" onClick={() => updateBonusScore('A', 1)}><Plus size={16} /></Button>
-              <Button variant="outline" size="icon" onClick={() => updateBonusScore('A', -1)}><Minus size={16} /></Button>
+            <div className="flex flex-col gap-1.5">
+              <div className="flex gap-1">
+                <Button variant="outline" size="xs" className="w-10" onClick={() => updateBonusScore('A', 1)}>+1</Button>
+                <Button variant="outline" size="xs" className="w-10" onClick={() => updateBonusScore('A', 5)}>+5</Button>
+                <Button variant="outline" size="xs" className="w-10" onClick={() => updateBonusScore('A', 10)}>+10</Button>
+              </div>
+              <div className="flex gap-1">
+                <Button variant="outline" size="xs" className="w-10" onClick={() => updateBonusScore('A', -1)}>-1</Button>
+                <Button variant="outline" size="xs" className="w-10" onClick={() => updateBonusScore('A', -5)}>-5</Button>
+                <Button variant="outline" size="xs" className="w-10" onClick={() => updateBonusScore('A', -10)}>-10</Button>
+              </div>
+              <div className="flex gap-1 mt-1 border-t border-border/50 pt-1.5">
+                <Input
+                  type="number"
+                  placeholder="직접 입력"
+                  className="h-7 w-20 text-[11px]"
+                  value={manualBonusA}
+                  onChange={(e) => setManualBonusA(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && handleAddManualBonus('A')}
+                />
+                <Button size="xs" onClick={() => handleAddManualBonus('A')}>추가</Button>
+              </div>
             </div>
           </div>
           <div className="bg-card rounded-lg p-6 border border-border flex items-center justify-between shadow-sm">
@@ -136,9 +188,28 @@ const AdminPage = () => {
               <p className="font-['Pretendard'] text-6xl text-primary mt-2 leading-none">{calculatedTotalB}</p>
               <p className="text-[11px] text-muted-foreground/60 mt-3 font-medium">수동 보너스: <span className="text-primary">{bonusScoreB > 0 ? `+${bonusScoreB}` : bonusScoreB}</span></p>
             </div>
-            <div className="flex flex-col gap-2">
-              <Button variant="outline" size="icon" onClick={() => updateBonusScore('B', 1)}><Plus size={16} /></Button>
-              <Button variant="outline" size="icon" onClick={() => updateBonusScore('B', -1)}><Minus size={16} /></Button>
+            <div className="flex flex-col gap-1.5">
+              <div className="flex gap-1">
+                <Button variant="outline" size="xs" className="w-10" onClick={() => updateBonusScore('B', 1)}>+1</Button>
+                <Button variant="outline" size="xs" className="w-10" onClick={() => updateBonusScore('B', 5)}>+5</Button>
+                <Button variant="outline" size="xs" className="w-10" onClick={() => updateBonusScore('B', 10)}>+10</Button>
+              </div>
+              <div className="flex gap-1">
+                <Button variant="outline" size="xs" className="w-10" onClick={() => updateBonusScore('B', -1)}>-1</Button>
+                <Button variant="outline" size="xs" className="w-10" onClick={() => updateBonusScore('B', -5)}>-5</Button>
+                <Button variant="outline" size="xs" className="w-10" onClick={() => updateBonusScore('B', -10)}>-10</Button>
+              </div>
+              <div className="flex gap-1 mt-1 border-t border-border/50 pt-1.5">
+                <Input
+                  type="number"
+                  placeholder="직접 입력"
+                  className="h-7 w-20 text-[11px]"
+                  value={manualBonusB}
+                  onChange={(e) => setManualBonusB(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && handleAddManualBonus('B')}
+                />
+                <Button size="xs" onClick={() => handleAddManualBonus('B')}>추가</Button>
+              </div>
             </div>
           </div>
         </div>
@@ -201,29 +272,54 @@ const AdminPage = () => {
                 </div>
               </div>
 
-              {/* Score controls */}
               {event.teamA && event.teamB && (
-                <div className="flex items-center gap-6 mt-2">
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm text-muted-foreground w-16">{event.teamA}</span>
-                    <Button size="sm" variant="secondary" onClick={() => updateScore(event.id, 'A', -1)}>
-                      <Minus size={14} />
-                    </Button>
-                    <span className="font-['Pretendard'] text-xl w-8 text-center text-foreground">{event.scoreA}</span>
-                    <Button size="sm" variant="secondary" onClick={() => updateScore(event.id, 'A', 1)}>
-                      <Plus size={14} />
-                    </Button>
+                <div className="flex flex-wrap items-center gap-4 mt-2">
+                  <div className="flex flex-wrap items-center gap-1.5 px-3 py-1 bg-secondary/20 rounded-lg">
+                    <span className="text-xs font-semibold text-muted-foreground w-12 truncate">{event.teamA}</span>
+                    <Button size="xs" variant="ghost" className="h-7 w-7 p-0" onClick={() => updateScore(event.id, 'A', -1)}><Minus size={14} /></Button>
+                    <span className="font-['Pretendard'] text-lg font-bold w-6 text-center text-foreground">{event.scoreA}</span>
+                    <Button size="xs" variant="ghost" className="h-7 w-7 p-0" onClick={() => updateScore(event.id, 'A', 1)}><Plus size={14} /></Button>
+                    <div className="flex gap-1 ml-1 border-l border-border pl-2 pr-2">
+                      <Button size="xs" variant="secondary" className="h-6 px-1.5 text-[10px]" onClick={() => updateScore(event.id, 'A', 2)}>+2</Button>
+                      <Button size="xs" variant="secondary" className="h-6 px-1.5 text-[10px]" onClick={() => updateScore(event.id, 'A', 3)}>+3</Button>
+                      <Button size="xs" variant="secondary" className="h-6 px-1.5 text-[10px]" onClick={() => updateScore(event.id, 'A', 5)}>+5</Button>
+                    </div>
+                    <div className="flex gap-1 border-l border-border pl-2">
+                      <Input
+                        type="number"
+                        placeholder="+n"
+                        className="h-6 w-12 text-[10px] px-1"
+                        value={eventManualInputs[event.id]?.A || ''}
+                        onChange={(e) => handleEventManualInputChange(event.id, 'A', e.target.value)}
+                        onKeyDown={(e) => e.key === 'Enter' && handleAddManualEventScore(event.id, 'A')}
+                      />
+                      <Button size="xs" className="h-6 px-1.5 text-[10px]" onClick={() => handleAddManualEventScore(event.id, 'A')}>추가</Button>
+                    </div>
                   </div>
-                  <span className="text-muted-foreground">vs</span>
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm text-muted-foreground w-16">{event.teamB}</span>
-                    <Button size="sm" variant="secondary" onClick={() => updateScore(event.id, 'B', -1)}>
-                      <Minus size={14} />
-                    </Button>
-                    <span className="font-['Pretendard'] text-xl w-8 text-center text-foreground">{event.scoreB}</span>
-                    <Button size="sm" variant="secondary" onClick={() => updateScore(event.id, 'B', 1)}>
-                      <Plus size={14} />
-                    </Button>
+
+                  <span className="text-muted-foreground font-bold text-xs">VS</span>
+
+                  <div className="flex flex-wrap items-center gap-1.5 px-3 py-1 bg-secondary/20 rounded-lg">
+                    <span className="text-xs font-semibold text-muted-foreground w-12 truncate">{event.teamB}</span>
+                    <Button size="xs" variant="ghost" className="h-7 w-7 p-0" onClick={() => updateScore(event.id, 'B', -1)}><Minus size={14} /></Button>
+                    <span className="font-['Pretendard'] text-lg font-bold w-6 text-center text-foreground">{event.scoreB}</span>
+                    <Button size="xs" variant="ghost" className="h-7 w-7 p-0" onClick={() => updateScore(event.id, 'B', 1)}><Plus size={14} /></Button>
+                    <div className="flex gap-1 ml-1 border-l border-border pl-2 pr-2">
+                      <Button size="xs" variant="secondary" className="h-6 px-1.5 text-[10px]" onClick={() => updateScore(event.id, 'B', 2)}>+2</Button>
+                      <Button size="xs" variant="secondary" className="h-6 px-1.5 text-[10px]" onClick={() => updateScore(event.id, 'B', 3)}>+3</Button>
+                      <Button size="xs" variant="secondary" className="h-6 px-1.5 text-[10px]" onClick={() => updateScore(event.id, 'B', 5)}>+5</Button>
+                    </div>
+                    <div className="flex gap-1 border-l border-border pl-2">
+                      <Input
+                        type="number"
+                        placeholder="+n"
+                        className="h-6 w-12 text-[10px] px-1"
+                        value={eventManualInputs[event.id]?.B || ''}
+                        onChange={(e) => handleEventManualInputChange(event.id, 'B', e.target.value)}
+                        onKeyDown={(e) => e.key === 'Enter' && handleAddManualEventScore(event.id, 'B')}
+                      />
+                      <Button size="xs" className="h-6 px-1.5 text-[10px]" onClick={() => handleAddManualEventScore(event.id, 'B')}>추가</Button>
+                    </div>
                   </div>
                   <Button size="sm" variant="destructive" onClick={() => resetScore(event.id)} className="gap-1">
                     <RotateCcw size={14} /> 초기화
