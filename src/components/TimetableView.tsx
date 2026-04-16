@@ -45,14 +45,14 @@ const TimetableView = () => {
   const seconds = time.getSeconds().toString().padStart(2, '0');
 
   return (
-    <div className="fixed inset-0 z-40 bg-[#F4F4F4] overflow-hidden flex items-start justify-center animate-in fade-in duration-500">
+    <div className="fixed inset-0 z-40 bg-[#F4F4F4] overflow-hidden flex items-center justify-center animate-in fade-in duration-500">
       <div
         className="relative shrink-0"
         style={{
           width: '1920px',
           height: '1080px',
           transform: `scale(${scale})`,
-          transformOrigin: 'top'
+          transformOrigin: 'center'
         }}
       >
         <img
@@ -85,37 +85,13 @@ const TimetableView = () => {
             });
 
             return effectiveEvents.map((event, index) => {
-              const isPink = index % 2 === 1;
-              const textColor = isPink ? 'text-black' : 'text-[#ff40c2]';
-
               return (
                 <div
                   key={event.id}
                   onClick={(e) => handleClick(e, event)}
                   className="relative flex-[1_1_100%] cursor-pointer transition-transform active:scale-95 flex flex-col items-center justify-center overflow-hidden"
                 >
-                  <div className="font-sans font-black text-[60px] text-zinc-900 leading-tight">
-                    {event.time}
-                  </div>
-                  <div className={`font-sans font-extrabold text-[80px] ${textColor} leading-tight text-center px-4`}>
-                    {event.name}
-                  </div>
-
-                  {event.status === 'IN_PROGRESS' && (
-                    <motion.div
-                      className="absolute top-4 right-4"
-                      animate={{ scale: [1, 1.2, 1] }}
-                      transition={{ duration: 1, repeat: Infinity }}
-                    >
-                      <div className="bg-red-500 text-white px-3 py-1 rounded text-[20px] font-bold uppercase tracking-wider shadow-lg">LIVE</div>
-                    </motion.div>
-                  )}
-
-                  {event.effectiveStatus === 'COMPLETED' && (
-                    <div className="absolute inset-0 bg-black/5 flex items-center justify-center pointer-events-none">
-                      <div className="bg-gray-800/80 px-4 py-2 rounded text-white font-bold text-4xl uppercase tracking-widest">COMPLETED</div>
-                    </div>
-                  )}
+                  {/* All text and status overlays removed as requested */}
                 </div>
               );
             });

@@ -73,9 +73,6 @@ const DisplayPage = () => {
         {effectiveViewMode === 'PREPARATION' && <PreparationView />}
       </div>
 
-      {/* Marquee Banner */}
-      <MarqueeBanner />
-
       {/* Big Announcement Overlay */}
       <AnnouncementOverlay show={showBigAnnouncement} announcement={announcement} />
     </div>

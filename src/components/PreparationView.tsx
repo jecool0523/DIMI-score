@@ -63,14 +63,14 @@ const PreparationView = () => {
   const arrowTransitions = [0, 0.4, 0.8];
 
   return (
-    <div className="fixed inset-0 z-40 bg-[#F4F4F4] overflow-hidden flex items-start justify-center animate-in fade-in duration-500">
+    <div className="fixed inset-0 z-40 bg-[#F4F4F4] overflow-hidden flex items-center justify-center animate-in fade-in duration-500">
       <div
         className="relative shrink-0"
         style={{
           width: '1920px',
           height: '1080px',
           transform: `scale(${scale})`,
-          transformOrigin: 'top'
+          transformOrigin: 'center'
         }}
       >
         <img src="/assets/background/준비화면.svg" className="absolute inset-0 w-full h-full object-cover -z-10" alt="" />
@@ -114,6 +114,10 @@ const PreparationView = () => {
               <img src="/assets/match-arrow.svg" className="w-full h-full" alt="" />
             </motion.div>
           ))}
+        </div>
+
+        <div className="absolute bottom-0 left-0 w-full h-[80px]">
+          <MarqueeBanner />
         </div>
       </div>
     </div>

@@ -30,7 +30,7 @@ const InProgressView = () => {
   }, []);
 
   useEffect(() => {
-    const timer = setInterval(() => setTime(new Date()), 1000);
+    const timer = setInterval(() => setTime(new Date()), 100);
     return () => clearInterval(timer);
   }, []);
 
@@ -72,14 +72,11 @@ const InProgressView = () => {
   const getRemainingTimeMs = () => {
     if (!current) return 0;
 
-    // Use setDuration (default to 15m)
-    const cdDurationMin = current.setDuration || 15;
+    // Use setDuration (fallback to duration or 15m)
+    const cdDurationMin = current.setDuration || current.duration || 15;
     const durationMs = cdDurationMin * 60 * 1000;
 
     // Determine the relevant start time for this countdown
-    // 1. setStartTime (explicit reset)
-    // 2. actualStartTime (game started)
-    // 3. scheduled time (fallback)
     let startTimestamp = current.setStartTime || current.actualStartTime;
 
     if (!startTimestamp && current.time) {
@@ -137,14 +134,14 @@ const InProgressView = () => {
   const progressWidth = baseWidth * progress;
 
   return (
-    <div className="fixed inset-0 z-40 bg-[#F4F4F4] flex items-start justify-center animate-in fade-in duration-500 overflow-hidden">
+    <div className="fixed inset-0 z-40 bg-[#F4F4F4] flex items-center justify-center animate-in fade-in duration-500 overflow-hidden">
       <div
         className="relative shrink-0"
         style={{
           width: '1920px',
           height: '1080px',
           transform: `scale(${scale})`,
-          transformOrigin: 'top'
+          transformOrigin: 'center'
         }}
       >
         <img
@@ -217,7 +214,7 @@ const InProgressView = () => {
 
         <div className="absolute top-[386px] left-0 w-[1920px] h-[25px] z-20">
           <div
-            className="h-full bg-[#FF5297] transition-all duration-1000 ease-linear"
+            className="h-full bg-[#FF5297]"
             style={{ width: `${progressWidth}px` }}
           />
         </div>
