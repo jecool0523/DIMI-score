@@ -3,6 +3,7 @@ import { useEventStore } from '@/store/useEventStore';
 import confetti from 'canvas-confetti';
 import TotalScoreBoard from './TotalScoreBoard';
 import RouletteNumber from './RouletteNumber';
+import { motion } from 'framer-motion';
 
 const InProgressView = () => {
   const events = useEventStore((s) => s.events);
@@ -68,6 +69,42 @@ const InProgressView = () => {
   const minutes = time.getMinutes().toString().padStart(2, '0');
   const seconds = time.getSeconds().toString().padStart(2, '0');
 
+  // Progress Calculation
+  const getProgress = () => {
+    if (!current) return 0;
+
+    const currentIndex = events.findIndex(e => e.id === current.id);
+    const nextEvent = events[currentIndex + 1];
+
+    let durationInMinutes = 40; // Default 40 mins
+    if (nextEvent) {
+      const getMinutes = (t: string) => {
+        const [h, m] = t.split(':').map(Number);
+        return h * 60 + m;
+      };
+      durationInMinutes = getMinutes(nextEvent.time) - getMinutes(current.time);
+      if (durationInMinutes <= 0) durationInMinutes = 40;
+    }
+
+    const durationMs = durationInMinutes * 60 * 1000;
+    let elapsedMs = 0;
+
+    if (current.actualStartTime) {
+      elapsedMs = Date.now() - current.actualStartTime;
+    } else {
+      // Fallback: use scheduled time of today
+      const now = new Date();
+      const [h, m] = current.time.split(':').map(Number);
+      const scheduledDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), h, m, 0);
+      elapsedMs = now.getTime() - scheduledDate.getTime();
+    }
+
+    return Math.min(Math.max(elapsedMs / durationMs, 0), 1);
+  };
+
+  const progress = getProgress();
+  const progressWidth = 1920 * progress;
+
   return (
     <div className="fixed inset-0 z-40 bg-[#F4F4F4] flex items-start justify-center animate-in fade-in duration-500">
       <div
@@ -90,17 +127,47 @@ const InProgressView = () => {
           {/* Icons Group - Centered & Narrower */}
           <div className="relative w-[480px] h-[100px] flex items-center justify-center">
             {/* Left Arrow */}
-            <div className="absolute left-0 w-[100px] h-[100px] -rotate-90">
+            <motion.div
+              className="absolute left-0 w-[100px] h-[100px] rotate-0 pt-[10px]"
+              initial={{ opacity: 0, x: -50 }}
+              animate={{
+                opacity: [0, 1, 1, 0],
+                x: [-50, 0, 0, -20],
+              }}
+              transition={{
+                duration: 4,
+                times: [0, 0.1, 0.8, 1],
+                ease: ["easeOut", "linear", "easeIn"],
+                repeat: Infinity,
+                repeatDelay: 4,
+              }}
+            >
               <img src="/assets/match-arrow.svg" className="w-full h-full" alt="" />
-            </div>
+            </motion.div>
+
             {/* Loop Icon */}
             <div className="w-[143px] h-[81px]">
               <img src="/assets/match-loop.svg" className="w-full h-full" alt="" />
             </div>
+
             {/* Right Arrow */}
-            <div className="absolute right-0 w-[100px] h-[100px] rotate-90">
+            <motion.div
+              className="absolute right-0 w-[100px] h-[100px] rotate-180 pt-[10px]"
+              initial={{ opacity: 0, x: 50 }}
+              animate={{
+                opacity: [0, 1, 1, 0],
+                x: [50, 0, 0, 20],
+              }}
+              transition={{
+                duration: 4,
+                times: [0, 0.1, 0.8, 1],
+                ease: ["easeOut", "linear", "easeIn"],
+                repeat: Infinity,
+                repeatDelay: 4,
+              }}
+            >
               <img src="/assets/match-arrow.svg" className="w-full h-full" alt="" />
-            </div>
+            </motion.div>
           </div>
 
           {/* Clock Text */}
@@ -109,6 +176,14 @@ const InProgressView = () => {
               {hours}:{minutes}:{seconds}
             </div>
           </div>
+        </div>
+
+        {/* Progress Bar on Divider Line */}
+        <div className="absolute top-[381px] left-0 w-[1920px] h-[30px] z-20">
+          <div
+            className="h-full bg-[#FF5297] shadow-[0_0_20px_rgba(255,82,151,0.6)] transition-all duration-1000 ease-linear"
+            style={{ width: `${progressWidth}px` }}
+          />
         </div>
 
         {/* Main Center Area */}

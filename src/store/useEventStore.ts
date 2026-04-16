@@ -14,6 +14,7 @@ export interface SportEvent {
   teamB?: string;
   scoreA: number;
   scoreB: number;
+  actualStartTime?: number;
 }
 
 interface EventStore {
@@ -59,7 +60,15 @@ export const useEventStore = create<EventStore>()(
 
       setEventStatus: (id, status) =>
         set((state) => ({
-          events: state.events.map((e) => (e.id === id ? { ...e, status } : e)),
+          events: state.events.map((e) =>
+            e.id === id
+              ? {
+                ...e,
+                status,
+                actualStartTime: status === 'IN_PROGRESS' ? Date.now() : e.actualStartTime
+              }
+              : e
+          ),
         })),
 
       updateScore: (id, team, delta) =>
