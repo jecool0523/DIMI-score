@@ -603,9 +603,14 @@ export const useEventStore = create<EventStore>((set, get) => ({
     try {
       const start = Date.now();
       const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+      const supabaseKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
       const response = await fetch(`${supabaseUrl}/rest/v1/?t=${start}`, {
         method: 'HEAD',
-        cache: 'no-store'
+        cache: 'no-store',
+        headers: {
+          'apikey': supabaseKey,
+          'Authorization': `Bearer ${supabaseKey}`,
+        },
       });
       const end = Date.now();
 
