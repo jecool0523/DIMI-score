@@ -1,22 +1,20 @@
 import { useEffect, useState } from 'react';
 import { useEventStore, type SportEvent } from '@/store/useEventStore';
 import TotalScoreBoard from './TotalScoreBoard';
-import { useIsMobile } from '@/hooks/use-mobile';
 import { motion } from 'framer-motion';
 
 const TimetableView = () => {
   const events = useEventStore((s) => s.events);
   const setEventStatus = useEventStore((s) => s.setEventStatus);
   const setViewMode = useEventStore((s) => s.setViewMode);
-  const isMobile = useIsMobile();
 
   const [scale, setScale] = useState(1);
   const [time, setTime] = useState(new Date());
 
   useEffect(() => {
     const handleResize = () => {
-      const baseWidth = isMobile ? 1080 : 1920;
-      const baseHeight = isMobile ? 1920 : 1080;
+      const baseWidth = 1920;
+      const baseHeight = 1080;
       const scaleW = window.innerWidth / baseWidth;
       const scaleH = window.innerHeight / baseHeight;
       setScale(Math.min(scaleW, scaleH));
@@ -24,7 +22,7 @@ const TimetableView = () => {
     handleResize();
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
-  }, [isMobile]);
+  }, []);
 
   useEffect(() => {
     const timer = setInterval(() => setTime(new Date()), 1000);
@@ -46,36 +44,6 @@ const TimetableView = () => {
   const minutes = time.getMinutes().toString().padStart(2, '0');
   const seconds = time.getSeconds().toString().padStart(2, '0');
 
-  if (isMobile) {
-    return (
-      <div className="fixed inset-0 z-40 bg-[#F4F4F4] flex flex-col items-stretch animate-in fade-in duration-500 overflow-y-auto">
-        <img
-          src="/assets/background/기본 화면(개막식).svg"
-          className="fixed inset-0 w-full h-full object-cover -z-10 opacity-30"
-          alt=""
-        />
-
-        <div className="shrink-0 bg-white/80 backdrop-blur-sm border-b border-gray-100">
-          <TotalScoreBoard />
-        </div>
-
-        <div className="flex-1 p-6 space-y-6 pb-32">
-          <h2 className="text-4xl font-black text-black tracking-tight mb-8">Match Schedule</h2>
-
-          <div className="space-y-4">
-            {/* Events hidden as requested */}
-          </div>
-        </div>
-
-        <div className="fixed bottom-0 left-0 w-full h-24 bg-white/90 backdrop-blur-md border-t border-gray-100 flex items-center justify-center z-50">
-          <p className="font-sans text-5xl text-black font-black tabular-nums tracking-tighter">
-            {hours}:{minutes}:{seconds}
-          </p>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="fixed inset-0 z-40 bg-[#F4F4F4] overflow-hidden flex items-start justify-center animate-in fade-in duration-500">
       <div
@@ -96,7 +64,62 @@ const TimetableView = () => {
         <TotalScoreBoard />
 
         <div className="absolute top-[120px] left-0 w-full flex h-[493px]">
-          {/* Events hidden as requested */}
+          {(() => {
+            const currentTotalMinutes = time.getHours() * 60 + time.getMinutes();
+            const getMinutes = (t: string) => {
+              const [h, m] = t.split(':').map(Number);
+              return h * 60 + m;
+            };
+
+            const effectiveEvents = events.map((ev, idx) => {
+              const nextEv = events[idx + 1];
+              const isTimeCompleted = nextEv
+                ? currentTotalMinutes >= getMinutes(nextEv.time)
+                : currentTotalMinutes >= getMinutes(ev.time) + 60;
+
+              let effStatus = ev.status;
+              if (effStatus === 'UPCOMING' && isTimeCompleted) {
+                effStatus = 'COMPLETED';
+              }
+              return { ...ev, effectiveStatus: effStatus };
+            });
+
+            return effectiveEvents.map((event, index) => {
+              const isPink = index % 2 === 1;
+              const textColor = isPink ? 'text-black' : 'text-[#ff40c2]';
+
+              return (
+                <div
+                  key={event.id}
+                  onClick={(e) => handleClick(e, event)}
+                  className="relative flex-[1_1_100%] cursor-pointer transition-transform active:scale-95 flex flex-col items-center justify-center overflow-hidden"
+                >
+                  <div className="font-sans font-black text-[60px] text-zinc-900 leading-tight">
+                    {event.time}
+                  </div>
+                  <div className={`font-sans font-extrabold text-[80px] ${textColor} leading-tight text-center px-4`}>
+                    {event.name}
+                  </div>
+
+                  {event.status === 'IN_PROGRESS' && (
+                    <motion.div
+                      className="absolute top-4 right-4"
+                      animate={{ scale: [1, 1.2, 1] }}
+                      transition={{ duration: 1, repeat: Infinity }}
+                    >
+                      <div className="bg-red-500 text-white px-3 py-1 rounded text-[20px] font-bold uppercase tracking-wider shadow-lg">LIVE</div>
+                    </motion.div>
+                  )}
+
+                  {event.effectiveStatus === 'COMPLETED' && (
+                    <div className="absolute inset-0 bg-black/5 flex items-center justify-center pointer-events-none">
+                      <div className="bg-gray-800/80 px-4 py-2 rounded text-white font-bold text-4xl uppercase tracking-widest">COMPLETED</div>
+                    </div>
+                  )}
+                </div>
+              );
+            });
+          })()}
         </div>
 
         <p className="absolute left-1/2 -translate-x-1/2 top-[580px] font-sans text-[395px] text-black leading-none tracking-[0.05em] m-0 whitespace-nowrap tabular-nums z-10 pointer-events-none shadow-none text-center">
