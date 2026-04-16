@@ -104,7 +104,7 @@ const AdminPage = () => {
             </div>
             <h1 className="font-['Pretendard'] text-2xl font-semibold text-foreground text-center">관리자 로그인</h1>
             <p className="text-sm text-muted-foreground text-center mt-2">페이지에 접근하려면 비밀번호를 입력해주세요.</p>
-            <p className="text-sm text-muted-foreground text-center mt-2">학생회 혹은 관련자가 아닌 분들은 접근하지 말아주세요.</p>
+            <p className="text-sm text-muted-foreground text-center mt-2">학생회 관련자가 아닌 분들은 접근하지 말아주세요.</p>
           </div>
           <form onSubmit={handleLogin} className="space-y-4">
             <Input
