@@ -55,15 +55,17 @@ export const useEventStore = create<EventStore>((set, get) => ({
 
   setViewMode: async (mode) => {
     set({ viewMode: mode });
-    await supabase.from('app_state').update({ view_mode: mode }).eq('id', 1);
+    const { error } = await supabase.from('app_state').update({ view_mode: mode }).eq('id', 1);
+    if (error) console.error('Error setting view mode:', error);
   },
   setAnnouncement: async (text) => {
     const timestamp = Date.now();
     set({ announcement: text, announcementTimestamp: timestamp });
-    await supabase.from('app_state').update({
+    const { error } = await supabase.from('app_state').update({
       announcement: text,
       announcement_timestamp: timestamp
     }).eq('id', 1);
+    if (error) console.error('Error setting announcement:', error);
   },
 
   setEventStatus: async (id, status) => {
@@ -76,10 +78,11 @@ export const useEventStore = create<EventStore>((set, get) => ({
       ),
     }));
 
-    await supabase.from('events').update({
+    const { error } = await supabase.from('events').update({
       status,
       actual_start_time: actualStartTime
     }).eq('id', id);
+    if (error) console.error('Error setting event status:', error);
   },
 
   updateScore: async (id, team, delta) => {
@@ -98,16 +101,18 @@ export const useEventStore = create<EventStore>((set, get) => ({
     }));
 
     const scoreKey = team === 'A' ? 'score_a' : 'score_b';
-    await supabase.from('events').update({
+    const { error } = await supabase.from('events').update({
       [scoreKey]: newScore
     } as any).eq('id', id);
+    if (error) console.error('Error updating score:', error);
   },
 
   resetScore: async (id) => {
     set((state) => ({
       events: state.events.map((e) => (e.id === id ? { ...e, scoreA: 0, scoreB: 0 } : e)),
     }));
-    await supabase.from('events').update({ score_a: 0, score_b: 0 }).eq('id', id);
+    const { error } = await supabase.from('events').update({ score_a: 0, score_b: 0 }).eq('id', id);
+    if (error) console.error('Error resetting score:', error);
   },
 
   updateBonusScore: async (team, delta) => {
@@ -115,21 +120,24 @@ export const useEventStore = create<EventStore>((set, get) => ({
     const newBonusB = team === 'B' ? get().bonusScoreB + delta : get().bonusScoreB;
 
     set({ bonusScoreA: newBonusA, bonusScoreB: newBonusB });
-    await supabase.from('app_state').update({
+    const { error } = await supabase.from('app_state').update({
       bonus_score_a: newBonusA,
       bonus_score_b: newBonusB
     }).eq('id', 1);
+    if (error) console.error('Error updating bonus score:', error);
   },
 
   resetBonusScore: async () => {
     set({ bonusScoreA: 0, bonusScoreB: 0 });
-    await supabase.from('app_state').update({ bonus_score_a: 0, bonus_score_b: 0 }).eq('id', 1);
+    const { error } = await supabase.from('app_state').update({ bonus_score_a: 0, bonus_score_b: 0 }).eq('id', 1);
+    if (error) console.error('Error resetting bonus score:', error);
   },
 
   triggerAnnouncement: async () => {
     const timestamp = Date.now();
     set({ announcementTimestamp: timestamp });
-    await supabase.from('app_state').update({ announcement_timestamp: timestamp }).eq('id', 1);
+    const { error } = await supabase.from('app_state').update({ announcement_timestamp: timestamp }).eq('id', 1);
+    if (error) console.error('Error triggering announcement:', error);
   },
 }));
 
@@ -138,17 +146,22 @@ const initStore = async () => {
   // 1. Fetch App State
   const { data: appState, error: appError } = await supabase.from('app_state').select('*').single();
 
-  if (appError || !appState) {
-    // If table is empty, initialize it
-    await supabase.from('app_state').insert([{
-      id: 1,
-      view_mode: 'TIMETABLE',
-      announcement: '🎉 제25회 체육대회에 오신 것을 환영합니다! 안전하고 즐거운 대회가 되길 바랍니다.',
-      announcement_timestamp: 0,
-      bonus_score_a: 0,
-      bonus_score_b: 0
-    }]);
-  } else {
+  if (appError) {
+    console.error('Error fetching app state:', appError);
+    if (appError.code === 'PGRST116') { // Not found
+      console.log('App state not found, initializing...');
+      const { error: insertError } = await supabase.from('app_state').insert([{
+        id: 1,
+        view_mode: 'TIMETABLE',
+        announcement: '🎉 제25회 체육대회에 오신 것을 환영합니다! 안전하고 즐거운 대회가 되길 바랍니다.',
+        announcement_timestamp: 0,
+        bonus_score_a: 0,
+        bonus_score_b: 0
+      }]);
+      if (insertError) console.error('Error initializing app state:', insertError);
+    }
+  } else if (appState) {
+    console.log('App state fetched successfully');
     useEventStore.setState({
       viewMode: appState.view_mode as any,
       announcement: appState.announcement,
@@ -161,8 +174,10 @@ const initStore = async () => {
   // 2. Fetch Events
   const { data: events, error: eventsError } = await supabase.from('events').select('*').order('time');
 
-  if (eventsError || !events || events.length === 0) {
-    // If table is empty, initialize with default events
+  if (eventsError) {
+    console.error('Error fetching events:', eventsError);
+  } else if (!events || events.length === 0) {
+    console.log('No events found, initializing...');
     const initialEvents = defaultEvents.map(e => ({
       id: e.id,
       name: e.name,
@@ -175,9 +190,11 @@ const initStore = async () => {
       score_b: e.scoreB,
       actual_start_time: e.actualStartTime
     }));
-    await supabase.from('events').insert(initialEvents);
+    const { error: insertError } = await supabase.from('events').insert(initialEvents);
+    if (insertError) console.error('Error initializing events:', insertError);
     useEventStore.setState({ events: defaultEvents });
   } else {
+    console.log('Events fetched successfully:', events.length);
     useEventStore.setState({
       events: events.map(e => ({
         id: e.id,
@@ -195,9 +212,11 @@ const initStore = async () => {
   }
 
   // 3. Setup Realtime Listeners
-  supabase
+  console.log('Setting up realtime listeners...');
+  const channel = supabase
     .channel('all-changes')
     .on('postgres_changes', { event: '*', schema: 'public', table: 'app_state' }, (payload) => {
+      console.log('App state changed:', payload);
       const newData = payload.new as any;
       useEventStore.setState({
         viewMode: newData.view_mode,
@@ -208,6 +227,7 @@ const initStore = async () => {
       });
     })
     .on('postgres_changes', { event: '*', schema: 'public', table: 'events' }, (payload) => {
+      console.log('Event changed:', payload);
       const newEvent = payload.new as any;
       const oldEvent = payload.old as any;
 
@@ -245,8 +265,9 @@ const initStore = async () => {
         }));
       }
     })
-    .subscribe();
+    .subscribe((status) => {
+      console.log('Realtime subscription status:', status);
+    });
 };
 
 initStore();
-
