@@ -63,64 +63,7 @@ const TimetableView = () => {
           <h2 className="text-4xl font-black text-black tracking-tight mb-8">Match Schedule</h2>
 
           <div className="space-y-4">
-            {(() => {
-              const currentTotalMinutes = time.getHours() * 60 + time.getMinutes();
-              const getMinutes = (t: string) => {
-                const [h, m] = t.split(':').map(Number);
-                return h * 60 + m;
-              };
-
-              const effectiveEvents = events.map((ev, idx) => {
-                const nextEv = events[idx + 1];
-                const isTimeCompleted = nextEv
-                  ? currentTotalMinutes >= getMinutes(nextEv.time)
-                  : currentTotalMinutes >= getMinutes(ev.time) + 60;
-
-                let effStatus = ev.status;
-                if (effStatus === 'UPCOMING' && isTimeCompleted) {
-                  effStatus = 'COMPLETED';
-                }
-                return { ...ev, effectiveStatus: effStatus };
-              });
-
-              return effectiveEvents.map((event, index) => {
-                const isPink = index % 2 === 1;
-                const textColor = isPink ? 'text-blue-600' : 'text-[#ff40c2]';
-
-                return (
-                  <div
-                    key={event.id}
-                    onClick={(e) => handleClick(e, event)}
-                    className="relative bg-white/60 backdrop-blur-md rounded-2xl p-6 border border-white shadow-lg flex items-center justify-between active:scale-95 transition-transform"
-                  >
-                    <div>
-                      <div className={`text-2xl font-black ${textColor}`}>
-                        {event.time}
-                      </div>
-                      <div className="text-3xl font-extrabold text-black">
-                        {event.name}
-                      </div>
-                    </div>
-
-                    {event.status === 'IN_PROGRESS' && (
-                      <motion.div
-                        animate={{ opacity: [1, 0.5, 1] }}
-                        transition={{ duration: 1, repeat: Infinity }}
-                        className="bg-red-500 text-white px-3 py-1 rounded-full text-sm font-bold"
-                      >
-                        LIVE
-                      </motion.div>
-                    )}
-
-                    {event.effectiveStatus === 'COMPLETED' && (
-                      <div className="text-gray-400 font-bold text-sm uppercase tracking-widest">
-                        DONE
-                      </div>
-                    )}
-                  </div>
-                );
-              });
-            })()}
+            {/* Events hidden as requested */}
           </div>
         </div>
 
@@ -153,62 +96,7 @@ const TimetableView = () => {
         <TotalScoreBoard />
 
         <div className="absolute top-[120px] left-0 w-full flex h-[493px]">
-          {(() => {
-            const currentTotalMinutes = time.getHours() * 60 + time.getMinutes();
-            const getMinutes = (t: string) => {
-              const [h, m] = t.split(':').map(Number);
-              return h * 60 + m;
-            };
-
-            const effectiveEvents = events.map((ev, idx) => {
-              const nextEv = events[idx + 1];
-              const isTimeCompleted = nextEv
-                ? currentTotalMinutes >= getMinutes(nextEv.time)
-                : currentTotalMinutes >= getMinutes(ev.time) + 60;
-
-              let effStatus = ev.status;
-              if (effStatus === 'UPCOMING' && isTimeCompleted) {
-                effStatus = 'COMPLETED';
-              }
-              return { ...ev, effectiveStatus: effStatus };
-            });
-
-            return effectiveEvents.map((event, index) => {
-              const isPink = index % 2 === 1;
-              const textColor = isPink ? 'text-black' : 'text-[#ff40c2]';
-
-              return (
-                <div
-                  key={event.id}
-                  onClick={(e) => handleClick(e, event)}
-                  className="relative flex-[1_1_100%] cursor-pointer transition-transform active:scale-95 flex flex-col items-center justify-center overflow-hidden"
-                >
-                  <div className="font-sans font-black text-[60px] text-zinc-900 leading-tight">
-                    {event.time}
-                  </div>
-                  <div className={`font-sans font-extrabold text-[80px] ${textColor} leading-tight text-center px-4`}>
-                    {event.name}
-                  </div>
-
-                  {event.status === 'IN_PROGRESS' && (
-                    <motion.div
-                      className="absolute top-4 right-4"
-                      animate={{ scale: [1, 1.2, 1] }}
-                      transition={{ duration: 1, repeat: Infinity }}
-                    >
-                      <div className="bg-red-500 text-white px-3 py-1 rounded text-[20px] font-bold uppercase tracking-wider shadow-lg">LIVE</div>
-                    </motion.div>
-                  )}
-
-                  {event.effectiveStatus === 'COMPLETED' && (
-                    <div className="absolute inset-0 bg-black/5 flex items-center justify-center pointer-events-none">
-                      <div className="bg-gray-800/80 px-4 py-2 rounded text-white font-bold text-4xl uppercase tracking-widest">COMPLETED</div>
-                    </div>
-                  )}
-                </div>
-              );
-            });
-          })()}
+          {/* Events hidden as requested */}
         </div>
 
         <p className="absolute left-1/2 -translate-x-1/2 top-[580px] font-sans text-[395px] text-black leading-none tracking-[0.05em] m-0 whitespace-nowrap tabular-nums z-10 pointer-events-none shadow-none text-center">

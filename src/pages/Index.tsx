@@ -27,6 +27,9 @@ const DisplayPage = () => {
     if (viewMode === 'IN_PROGRESS') {
       if (currentEvent) {
         setEffectiveViewMode('IN_PROGRESS');
+      } else {
+        // Fallback to timetable if no current event is set to progress
+        setEffectiveViewMode('TIMETABLE');
       }
     } else {
       setEffectiveViewMode(viewMode);

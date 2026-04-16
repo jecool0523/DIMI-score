@@ -67,13 +67,7 @@ const InProgressView = () => {
   }, [current?.scoreB]);
 
   if (!current) {
-    return (
-      <div className="fixed inset-0 z-40 bg-[#111] flex items-center justify-center animate-in fade-in duration-500">
-        <p className={`font-sans ${isMobile ? 'text-2xl px-6 text-center' : 'text-5xl'} text-white uppercase font-black`}>
-          현재 진행 중인 종목이 없습니다
-        </p>
-      </div>
-    );
+    return null;
   }
 
   // Countdown Calculation
