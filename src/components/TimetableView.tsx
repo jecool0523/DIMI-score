@@ -29,11 +29,6 @@ const TimetableView = ({ isLunchTime = false }: { isLunchTime?: boolean }) => {
     return () => clearInterval(timer);
   }, []);
 
-  const handleClick = (e: React.MouseEvent, event: SportEvent) => {
-    e.stopPropagation();
-    setEventStatus(event.id, 'IN_PROGRESS');
-  };
-
   const hours = time.getHours().toString().padStart(2, '0');
   const minutes = time.getMinutes().toString().padStart(2, '0');
   const seconds = time.getSeconds().toString().padStart(2, '0');
@@ -86,8 +81,7 @@ const TimetableView = ({ isLunchTime = false }: { isLunchTime?: boolean }) => {
               return (
                 <div
                   key={event.id}
-                  onClick={(e) => handleClick(e, event)}
-                  className="relative flex-[1_1_100%] cursor-pointer transition-transform active:scale-95 flex flex-col items-center justify-center overflow-hidden"
+                  className="relative flex-[1_1_100%] flex flex-col items-center justify-center overflow-hidden"
                 >
                   {/* All text and status overlays removed as requested */}
                 </div>
@@ -100,35 +94,37 @@ const TimetableView = ({ isLunchTime = false }: { isLunchTime?: boolean }) => {
           {hours}:{minutes}:{seconds}
         </p>
 
-        <div className="absolute top-[120px] left-[170px] w-[100px] h-[493px] flex flex-col items-center justify-center gap-[40px] z-20">
-          {[0, 0.4, 0.8].map((delay, i) => (
-            <motion.div
-              key={i}
-              className="w-[100px] h-[100px]"
-              style={{ rotate: 90 }}
-              initial={{ opacity: 0, x: -30 }}
-              animate={{
-                opacity: [0, 1, 1, 0],
-                x: [-30, 0, 0, 30],
-              }}
-              transition={{
-                duration: 3,
-                times: [0, 0.1, 0.8, 1],
-                ease: ["easeOut", "linear", "easeIn"],
-                repeat: Infinity,
-                repeatDelay: 3,
-                delay: delay
-              }}
-            >
-              <img
-                src="/assets/match-arrow.svg"
-                className="w-full h-full"
-                style={{ filter: 'brightness(0) invert(1)' }}
-                alt=""
-              />
-            </motion.div>
-          ))}
-        </div>
+        {!isLunchTime && (
+          <div className="absolute top-[120px] left-[170px] w-[100px] h-[493px] flex flex-col items-center justify-center gap-[40px] z-20">
+            {[0, 0.4, 0.8].map((delay, i) => (
+              <motion.div
+                key={i}
+                className="w-[100px] h-[100px]"
+                style={{ rotate: 90 }}
+                initial={{ opacity: 0, x: -30 }}
+                animate={{
+                  opacity: [0, 1, 1, 0],
+                  x: [-30, 0, 0, 30],
+                }}
+                transition={{
+                  duration: 3,
+                  times: [0, 0.1, 0.8, 1],
+                  ease: ["easeOut", "linear", "easeIn"],
+                  repeat: Infinity,
+                  repeatDelay: 3,
+                  delay: delay
+                }}
+              >
+                <img
+                  src="/assets/match-arrow.svg"
+                  className="w-full h-full"
+                  style={{ filter: 'brightness(0) invert(1)' }}
+                  alt=""
+                />
+              </motion.div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

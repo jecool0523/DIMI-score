@@ -81,7 +81,7 @@ const PreparationView = () => {
           </div>
         </div>
 
-        <div className="absolute top-[656px] left-0 w-[1046px] h-[325px] flex items-center gap-[100px] px-[150px]">
+        {nextEvent.name !== '점심 식사' && <div className="absolute top-[656px] left-0 w-[1046px] h-[325px] flex items-center gap-[100px] px-[150px]">
           {arrowTransitions.map((delay, i) => (
             <motion.div
               key={i}
@@ -104,7 +104,7 @@ const PreparationView = () => {
               <img src="/assets/match-arrow.svg" className="w-full h-full" alt="" />
             </motion.div>
           ))}
-        </div>
+        </div>}
       </div>
     </div>
   );
