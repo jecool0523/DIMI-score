@@ -12,28 +12,52 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
 
 // No modeButtons needed anymore as the display is fully reactive
 
 const AdminPage = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isLoadingAuth, setIsLoadingAuth] = useState(true);
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
   useEffect(() => {
-    if (sessionStorage.getItem('dimi-admin-auth') === 'true') {
-      setIsAuthenticated(true);
-    }
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setIsAuthenticated(!!session);
+      setIsLoadingAuth(false);
+    });
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setIsAuthenticated(!!session);
+    });
+
+    return () => subscription.unsubscribe();
   }, []);
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (password === 'dimi') {
-      setIsAuthenticated(true);
-      sessionStorage.setItem('dimi-admin-auth', 'true');
-      toast.success('관리자 페이지에 로그인되었습니다.');
+    if (!email || !password) return;
+    
+    setIsLoadingAuth(true);
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+    
+    if (error) {
+      toast.error('로그인에 실패했습니다. 이메일과 비밀번호를 확인해주세요.');
     } else {
-      toast.error('비밀번호가 틀렸습니다.');
+      toast.success('관리자 페이지에 로그인되었습니다.');
     }
+    setIsLoadingAuth(false);
+  };
+  
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    toast.info('로그아웃 되었습니다.');
   };
 
   const { events, setEventStatus, updateScore, resetScore, setAnnouncement, bonusScoreA, bonusScoreB, updateBonusScore, resetBonusScore, triggerAnnouncement, updateEventDuration, updateEventSetDuration, resetSetTimer, resetToDefaultSchedule } = useEventStore();
@@ -119,14 +143,25 @@ const AdminPage = () => {
           </div>
           <form onSubmit={handleLogin} className="space-y-4">
             <Input
+              type="email"
+              placeholder="관리자 이메일을 입력하세요"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full text-center"
+              autoFocus
+              disabled={isLoadingAuth}
+            />
+            <Input
               type="password"
               placeholder="비밀번호를 입력하세요"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="w-full text-center"
-              autoFocus
+              disabled={isLoadingAuth}
             />
-            <Button type="submit" className="w-full">접속하기</Button>
+            <Button type="submit" className="w-full" disabled={isLoadingAuth}>
+              {isLoadingAuth ? '로그인 중...' : '접속하기'}
+            </Button>
           </form>
         </div>
       </div>
@@ -137,11 +172,7 @@ const AdminPage = () => {
     <div className="min-h-screen bg-background p-6">
       <div className="flex items-center justify-between mb-6 border-b border-border pb-4">
         <h1 className="font-['Pretendard'] text-3xl text-foreground">⚙️ 컨트롤 패널</h1>
-        <Button variant="outline" size="sm" onClick={() => {
-          sessionStorage.removeItem('dimi-admin-auth');
-          setIsAuthenticated(false);
-          toast.info('로그아웃 되었습니다.');
-        }}>
+        <Button variant="outline" size="sm" onClick={handleLogout}>
           로그아웃
         </Button>
       </div>
