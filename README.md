@@ -3,10 +3,9 @@
 > **"학교 체육대회의 모든 점수와 공지를 실시간으로, 끊김 없이 전달합니다."**
 
 <aside>
-🔗
+🔗사이트 링크 : https://dimi-score.vercel.app/
 
-사이트 링크 : https://dimi-score.vercel.app/
-프로젝트 Doc : [https://www.notion.so/DIMI-score-337fe0074be780158d3ff820f9c5126a?source=copy_link](https://www.notion.so/DIMI-score-337fe0074be780158d3ff820f9c5126a?pvs=21)
+🔗프로젝트 Doc : [https://www.notion.so/DIMI-score-337fe0074be780158d3ff820f9c5126a?source=copy_link](https://www.notion.so/DIMI-score-337fe0074be780158d3ff820f9c5126a?pvs=21)
 
 </aside>
 
