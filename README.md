@@ -1,9 +1,14 @@
 # DIMI-scroe / README.md
 
 > **"학교 체육대회의 모든 점수와 공지를 실시간으로, 끊김 없이 전달합니다."**
-> 
+
+<aside>
+🔗
+
 사이트 링크 : https://dimi-score.vercel.app/
-프로젝트 Doc : https://www.notion.so/DIMI-score-337fe0074be780158d3ff820f9c5126a?source=copy_link
+프로젝트 Doc : [https://www.notion.so/DIMI-score-337fe0074be780158d3ff820f9c5126a?source=copy_link](https://www.notion.so/DIMI-score-337fe0074be780158d3ff820f9c5126a?pvs=21)
+
+</aside>
 
 DIMI-score는 제25회 체육대회 운영을 위해 개발된 실시간 점수판 및 관리 시스템입니다. 체육대회 당일, 야외 운동장이나 체육관에 있는 학생들에게 종목별 점수, 진행 상황, 대형 공지사항 등을 실시간으로 송출하기 위해 만들어졌습니다.
 
